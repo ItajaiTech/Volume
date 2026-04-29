@@ -92,6 +92,9 @@ APP_HOST = os.getenv("VOLUME_BIND_HOST", os.getenv("VOLUME_HOST", "0.0.0.0"))
 APP_PUBLIC_HOST = os.getenv("VOLUME_PUBLIC_HOST", "volume.local")
 APP_SERVER_NAME = os.getenv("VOLUME_SERVER_NAME", f"{APP_PUBLIC_HOST}:{APP_PORT}")
 APP_DEBUG = safe_bool_env("VOLUME_DEBUG", True)
+APP_URL_SCHEME = os.getenv("VOLUME_URL_SCHEME", "http").strip().lower()
+SSL_CERT_FILE = os.getenv("VOLUME_SSL_CERT_FILE", os.path.join(BASE_DIR, "certs", "volume.local.crt"))
+SSL_KEY_FILE = os.getenv("VOLUME_SSL_KEY_FILE", os.path.join(BASE_DIR, "certs", "volume.local.key"))
 DEFAULT_BOXES_XLSX = os.getenv(
     "VOLUME_BOXES_TEMPLATE",
     os.path.normpath(os.path.join(BASE_DIR, "..", "Caixas.xlsx")),
@@ -141,7 +144,7 @@ for raw_host in extra_trusted_hosts.split(","):
 
 app.config["SERVER_NAME"] = APP_SERVER_NAME
 app.config["TRUSTED_HOSTS"] = trusted_hosts
-app.config["PREFERRED_URL_SCHEME"] = os.getenv("VOLUME_URL_SCHEME", "http")
+app.config["PREFERRED_URL_SCHEME"] = APP_URL_SCHEME
 
 
 def admin_required(view_func):
@@ -2092,7 +2095,15 @@ def order_volumetry_save(order_id):
 
 
 if __name__ == "__main__":
-    if safe_bool_env("VOLUME_USE_WAITRESS", not APP_DEBUG):
+    wants_https = APP_URL_SCHEME == "https"
+    has_ssl_files = os.path.exists(SSL_CERT_FILE) and os.path.exists(SSL_KEY_FILE)
+    use_waitress = safe_bool_env("VOLUME_USE_WAITRESS", not APP_DEBUG)
+
+    if use_waitress and wants_https and has_ssl_files:
+        print("HTTPS detectado com certificado local. Iniciando com Flask SSL em vez de Waitress.")
+        use_waitress = False
+
+    if use_waitress:
         from waitress import serve
 
         serve(
@@ -2102,4 +2113,10 @@ if __name__ == "__main__":
             threads=safe_int_env("VOLUME_THREADS", 8),
         )
     else:
-        app.run(host=APP_HOST, port=APP_PORT, debug=APP_DEBUG)
+        ssl_context = None
+        if wants_https and has_ssl_files:
+            ssl_context = (SSL_CERT_FILE, SSL_KEY_FILE)
+        elif wants_https:
+            print("HTTPS solicitado, mas certificado/chave nao encontrados. Iniciando sem TLS.")
+
+        app.run(host=APP_HOST, port=APP_PORT, debug=APP_DEBUG, ssl_context=ssl_context)
