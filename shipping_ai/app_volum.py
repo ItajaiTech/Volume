@@ -1,6 +1,7 @@
 import os
 import re
 import json
+import threading
 from collections import defaultdict
 from functools import wraps
 from uuid import uuid4
@@ -88,9 +89,13 @@ def form_checkbox_to_int(form_data, key):
 
 
 APP_PORT = safe_int_env("VOLUME_PORT", 6100)
+APP_HTTP_PORT = safe_int_env("VOLUME_HTTP_PORT", 6080)
 APP_HOST = os.getenv("VOLUME_BIND_HOST", os.getenv("VOLUME_HOST", "0.0.0.0"))
 APP_PUBLIC_HOST = os.getenv("VOLUME_PUBLIC_HOST", "volume.local")
-APP_SERVER_NAME = os.getenv("VOLUME_SERVER_NAME", f"{APP_PUBLIC_HOST}:{APP_PORT}")
+APP_SERVER_NAME = os.getenv(
+    "VOLUME_SERVER_NAME",
+    APP_PUBLIC_HOST if APP_PORT == 443 else f"{APP_PUBLIC_HOST}:{APP_PORT}",
+)
 APP_DEBUG = safe_bool_env("VOLUME_DEBUG", True)
 APP_URL_SCHEME = os.getenv("VOLUME_URL_SCHEME", "http").strip().lower()
 SSL_CERT_FILE = os.getenv("VOLUME_SSL_CERT_FILE", os.path.join(BASE_DIR, "certs", "volume.local.crt"))
@@ -2125,6 +2130,31 @@ if __name__ == "__main__":
         ssl_context = None
         if wants_https and has_ssl_files:
             ssl_context = (SSL_CERT_FILE, SSL_KEY_FILE)
+
+            redirect_app = Flask("volume_http_redirect")
+
+            @redirect_app.route("/", defaults={"path": ""}, methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"])
+            @redirect_app.route("/<path:path>", methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"])
+            def redirect_to_https(path):
+                host = request.host.split(":", 1)[0]
+                target = f"https://{host}" if APP_PORT == 443 else f"https://{host}:{APP_PORT}"
+                if path:
+                    target = f"{target}/{path}"
+                if request.query_string:
+                    target = f"{target}?{request.query_string.decode()}"
+                return redirect(target, code=301)
+
+            redirect_thread = threading.Thread(
+                target=redirect_app.run,
+                kwargs={
+                    "host": APP_HOST,
+                    "port": APP_HTTP_PORT,
+                    "debug": False,
+                    "use_reloader": False,
+                },
+                daemon=True,
+            )
+            redirect_thread.start()
         elif wants_https:
             print("HTTPS solicitado, mas certificado/chave nao encontrados. Iniciando sem TLS.")
 

@@ -37,8 +37,8 @@ if ($relogioStarted -and $volumeStarted) {
 }
 
 if ($relogioStarted) {
-    Write-Host "RelogioPonto: https://ponto.local:5000 (ou https://ponto.admin:5050)"
+    Write-Host "RelogioPonto: https://ponto.local (ou https://ponto.admin)"
 }
 if ($volumeStarted) {
-    Write-Host "Volume: http://volume.local:6100"
+    Write-Host "Volume: https://volume.local"
 }

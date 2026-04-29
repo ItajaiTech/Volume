@@ -77,8 +77,11 @@ if (-not $env:VOLUME_PUBLIC_HOST) {
 if (-not $env:VOLUME_PORT) {
     $env:VOLUME_PORT = "6100"
 }
+if (-not $env:VOLUME_HTTP_PORT) {
+    $env:VOLUME_HTTP_PORT = "6080"
+}
 if (-not $env:VOLUME_URL_SCHEME) {
-    $env:VOLUME_URL_SCHEME = "https"
+    $env:VOLUME_URL_SCHEME = "http"
 }
 if (-not $env:VOLUME_SSL_CERT_FILE) {
     $env:VOLUME_SSL_CERT_FILE = Join-Path $appPath "certs\volume.local.crt"
@@ -90,7 +93,7 @@ if (-not $env:VOLUME_SERVER_NAME) {
     $env:VOLUME_SERVER_NAME = $env:VOLUME_PUBLIC_HOST
 }
 if (-not $env:VOLUME_TRUSTED_HOSTS) {
-    $env:VOLUME_TRUSTED_HOSTS = "volume.local,volume.local:6100"
+    $env:VOLUME_TRUSTED_HOSTS = "volume.local,volume.local:6100,volume.local:443,volume.local:80"
 }
 
 if (-not $env:VOLUME_DEBUG) {
@@ -109,9 +112,23 @@ if ($httpsRequested -and $hasCertFiles -and $env:VOLUME_USE_WAITRESS -eq "1") {
 
 $existingListener = Get-NetTCPConnection -LocalPort ([int]$env:VOLUME_PORT) -State Listen -ErrorAction SilentlyContinue
 if ($existingListener) {
-    Write-Host "Volume ja esta em execucao na porta $($env:VOLUME_PORT)." -ForegroundColor Yellow
-    Start-Process "$($env:VOLUME_URL_SCHEME)://$($env:VOLUME_PUBLIC_HOST):$($env:VOLUME_PORT)"
-    exit 0
+    $listenerPid = $existingListener[0].OwningProcess
+    $listenerProcess = Get-CimInstance Win32_Process -Filter "ProcessId = $listenerPid" -ErrorAction SilentlyContinue
+    $isVolumeProcess = $listenerProcess -and $listenerProcess.CommandLine -match "app_volum\.py"
+
+    if ($isVolumeProcess) {
+        Write-Host "Volume ja esta em execucao na porta $($env:VOLUME_PORT)." -ForegroundColor Yellow
+        if ([int]$env:VOLUME_PORT -eq 443) {
+            Start-Process "$($env:VOLUME_URL_SCHEME)://$($env:VOLUME_PUBLIC_HOST)"
+        } else {
+            Start-Process "$($env:VOLUME_URL_SCHEME)://$($env:VOLUME_PUBLIC_HOST):$($env:VOLUME_PORT)"
+        }
+        exit 0
+    }
+
+    Write-Host "Porta $($env:VOLUME_PORT) esta em uso por outro processo (PID $listenerPid)." -ForegroundColor Red
+    Write-Host "Pare o processo atual ou use outra porta para o Volume (VOLUME_PORT)." -ForegroundColor Yellow
+    exit 1
 }
 
 Write-Host "Atualizando dependencias do Volume..." -ForegroundColor Yellow
@@ -122,11 +139,19 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Set-Location $appPath
-Write-Host "Iniciando Volume em $($env:VOLUME_URL_SCHEME)://$($env:VOLUME_PUBLIC_HOST):$($env:VOLUME_PORT)" -ForegroundColor Green
+if ([int]$env:VOLUME_PORT -eq 443) {
+    Write-Host "Iniciando Volume em $($env:VOLUME_URL_SCHEME)://$($env:VOLUME_PUBLIC_HOST)" -ForegroundColor Green
+} else {
+    Write-Host "Iniciando Volume em $($env:VOLUME_URL_SCHEME)://$($env:VOLUME_PUBLIC_HOST):$($env:VOLUME_PORT)" -ForegroundColor Green
+}
 Write-Host "Bind interno: $($env:VOLUME_URL_SCHEME)://$($env:VOLUME_BIND_HOST):$($env:VOLUME_PORT)" -ForegroundColor DarkGray
 
 if ($env:VOLUME_OPEN_BROWSER -ne "0") {
-    Start-Process "$($env:VOLUME_URL_SCHEME)://$($env:VOLUME_PUBLIC_HOST):$($env:VOLUME_PORT)"
+    if ([int]$env:VOLUME_PORT -eq 443) {
+        Start-Process "$($env:VOLUME_URL_SCHEME)://$($env:VOLUME_PUBLIC_HOST)"
+    } else {
+        Start-Process "$($env:VOLUME_URL_SCHEME)://$($env:VOLUME_PUBLIC_HOST):$($env:VOLUME_PORT)"
+    }
 }
 
 & $venvPython "$appPath\app_volum.py"

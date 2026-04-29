@@ -1,0 +1,42 @@
+{
+    auto_https off
+}
+
+http://ponto.local {
+    redir https://ponto.local{uri} 301
+}
+
+http://ponto.admin {
+    redir https://ponto.admin{uri} 301
+}
+
+http://volume.local {
+    redir https://volume.local{uri} 301
+}
+
+https://ponto.local {
+    tls C:\RelogioPonto\Ponto\certs\ponto.crt C:\RelogioPonto\Ponto\certs\ponto.key
+    reverse_proxy https://127.0.0.1:5000 {
+        transport http {
+            tls_insecure_skip_verify
+        }
+        header_up X-Forwarded-Proto https
+    }
+}
+
+https://ponto.admin {
+    tls C:\RelogioPonto\Ponto\certs\ponto.crt C:\RelogioPonto\Ponto\certs\ponto.key
+    reverse_proxy https://127.0.0.1:5000 {
+        transport http {
+            tls_insecure_skip_verify
+        }
+        header_up X-Forwarded-Proto https
+    }
+}
+
+https://volume.local {
+    tls C:\Volume\Volume\shipping_ai\certs\volume.local.crt C:\Volume\Volume\shipping_ai\certs\volume.local.key
+    reverse_proxy http://127.0.0.1:6100 {
+        header_up X-Forwarded-Proto https
+    }
+}

@@ -24,11 +24,23 @@ if (-not $env:VOLUME_BIND_HOST) {
 if (-not $env:VOLUME_PUBLIC_HOST) {
     $env:VOLUME_PUBLIC_HOST = "volume.local"
 }
+if (-not $env:VOLUME_PORT) {
+    $env:VOLUME_PORT = "6100"
+}
 
-$existingListener = Get-NetTCPConnection -LocalPort 6100 -State Listen -ErrorAction SilentlyContinue
+$existingListener = Get-NetTCPConnection -LocalPort ([int]$env:VOLUME_PORT) -State Listen -ErrorAction SilentlyContinue
 if ($existingListener) {
-    Write-Host "Volume ja esta em execucao na porta 6100."
-    exit 0
+    $listenerPid = $existingListener[0].OwningProcess
+    $listenerProcess = Get-CimInstance Win32_Process -Filter "ProcessId = $listenerPid" -ErrorAction SilentlyContinue
+    $isVolumeProcess = $listenerProcess -and $listenerProcess.CommandLine -match "app_volum\.py"
+
+    if ($isVolumeProcess) {
+        Write-Host "Volume ja esta em execucao na porta $($env:VOLUME_PORT)."
+        exit 0
+    }
+
+    Write-Host "Porta $($env:VOLUME_PORT) ocupada por outro processo (PID $listenerPid). Nao foi possivel iniciar o Volume em background." -ForegroundColor Yellow
+    exit 1
 }
 
 Start-Process powershell.exe `

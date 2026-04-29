@@ -9,3 +9,7 @@ Press CTRL+C to quit
 127.0.0.1 - - [29/Apr/2026 16:05:11] "GET /user/upload HTTP/1.1" 200 -
 127.0.0.1 - - [29/Apr/2026 16:05:11] "GET /static/style.css HTTP/1.1" 304 -
 127.0.0.1 - - [29/Apr/2026 16:05:11] "GET /static/favicon.svg HTTP/1.1" 200 -
+127.0.0.1 - - [29/Apr/2026 16:06:11] "HEAD /favicon.ico HTTP/1.1" 200 -
+127.0.0.1 - - [29/Apr/2026 16:07:11] "GET /user/upload HTTP/1.1" 200 -
+127.0.0.1 - - [29/Apr/2026 16:07:12] "GET /static/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [29/Apr/2026 16:07:12] "GET /static/favicon.svg HTTP/1.1" 200 -
