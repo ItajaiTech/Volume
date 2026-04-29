@@ -80,6 +80,12 @@ if (-not $env:VOLUME_PORT) {
 if (-not $env:VOLUME_URL_SCHEME) {
     $env:VOLUME_URL_SCHEME = "https"
 }
+if (-not $env:VOLUME_SSL_CERT_FILE) {
+    $env:VOLUME_SSL_CERT_FILE = Join-Path $appPath "certs\volume.local.crt"
+}
+if (-not $env:VOLUME_SSL_KEY_FILE) {
+    $env:VOLUME_SSL_KEY_FILE = Join-Path $appPath "certs\volume.local.key"
+}
 if (-not $env:VOLUME_SERVER_NAME) {
     $env:VOLUME_SERVER_NAME = $env:VOLUME_PUBLIC_HOST
 }
@@ -92,6 +98,13 @@ if (-not $env:VOLUME_DEBUG) {
 }
 if (-not $env:VOLUME_USE_WAITRESS) {
     $env:VOLUME_USE_WAITRESS = "1"
+}
+
+$httpsRequested = $env:VOLUME_URL_SCHEME -eq "https"
+$hasCertFiles = (Test-Path $env:VOLUME_SSL_CERT_FILE) -and (Test-Path $env:VOLUME_SSL_KEY_FILE)
+if ($httpsRequested -and $hasCertFiles -and $env:VOLUME_USE_WAITRESS -eq "1") {
+    Write-Host "HTTPS com certificado detectado. Desativando Waitress para usar TLS nativo do Flask." -ForegroundColor Yellow
+    $env:VOLUME_USE_WAITRESS = "0"
 }
 
 $existingListener = Get-NetTCPConnection -LocalPort ([int]$env:VOLUME_PORT) -State Listen -ErrorAction SilentlyContinue
