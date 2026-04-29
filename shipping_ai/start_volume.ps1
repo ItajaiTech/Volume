@@ -1,5 +1,8 @@
 # Inicia o sistema Volume em ambiente virtual isolado
-$appPath = "C:\Volume\shipping_ai"
+$appPath = $PSScriptRoot
+if (-not $appPath) {
+    $appPath = Split-Path -Parent $MyInvocation.MyCommand.Path
+}
 $venvDir = "$appPath\.venv"
 $venvPython = "$venvDir\Scripts\python.exe"
 
@@ -12,7 +15,8 @@ function New-VolumeVenv {
     $attempts = @(
         @{ Label = "C:\python314\python.exe"; Command = "C:\python314\python.exe"; Args = @("-m", "venv", $TargetPath) },
         @{ Label = "py -3"; Command = "py"; Args = @("-3", "-m", "venv", $TargetPath) },
-        @{ Label = "python"; Command = "python"; Args = @("-m", "venv", $TargetPath) }
+        @{ Label = "python"; Command = "python"; Args = @("-m", "venv", $TargetPath) },
+        @{ Label = "uv venv"; Command = "uv"; Args = @("venv", $TargetPath) }
     )
 
     foreach ($attempt in $attempts) {
@@ -42,9 +46,15 @@ if (-not (Test-Path $venvPython)) {
     }
 }
 
-$env:VOLUME_BIND_HOST = "0.0.0.0"
-$env:VOLUME_PUBLIC_HOST = "volume.local"
-$env:VOLUME_PORT = "6100"
+if (-not $env:VOLUME_BIND_HOST) {
+    $env:VOLUME_BIND_HOST = "0.0.0.0"
+}
+if (-not $env:VOLUME_PUBLIC_HOST) {
+    $env:VOLUME_PUBLIC_HOST = "util.local"
+}
+if (-not $env:VOLUME_PORT) {
+    $env:VOLUME_PORT = "6100"
+}
 if (-not $env:VOLUME_URL_SCHEME) {
     $env:VOLUME_URL_SCHEME = "https"
 }

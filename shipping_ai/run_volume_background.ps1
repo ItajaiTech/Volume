@@ -1,5 +1,8 @@
 # Inicia o Volume em segundo plano, sem depender de uma janela aberta do PowerShell.
-$appPath = "C:\Volume\shipping_ai"
+$appPath = $PSScriptRoot
+if (-not $appPath) {
+    $appPath = Split-Path -Parent $MyInvocation.MyCommand.Path
+}
 $launcherScript = "$appPath\start_volume.ps1"
 $logDir = "$appPath\logs"
 $stdoutLog = "$logDir\volume_stdout.log"

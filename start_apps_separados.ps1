@@ -1,6 +1,10 @@
 # Inicia RelogioPonto e Volume em janelas separadas e ambientes isolados
 $relogioScript = "C:\RelogioPonto\start_relogioponto.ps1"
-$volumeScript = "C:\Volume\shipping_ai\start_volume.ps1"
+$workspaceRoot = $PSScriptRoot
+if (-not $workspaceRoot) {
+    $workspaceRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+}
+$volumeScript = Join-Path $workspaceRoot "shipping_ai\start_volume.ps1"
 $relogioStarted = $false
 $volumeStarted = $false
 
@@ -15,7 +19,7 @@ if (-not (Test-Path $volumeScript)) {
     Write-Host "Script do Volume nao encontrado: $volumeScript" -ForegroundColor Red
 } else {
     Start-Sleep -Seconds 2
-    Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$volumeScript`"" -WorkingDirectory "C:\Volume\shipping_ai"
+    Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$volumeScript`"" -WorkingDirectory (Split-Path -Parent $volumeScript)
     $volumeStarted = $true
 }
 
