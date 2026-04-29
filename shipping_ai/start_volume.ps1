@@ -6,13 +6,29 @@ if (-not $appPath) {
 $venvDir = "$appPath\.venv"
 $venvPython = "$venvDir\Scripts\python.exe"
 
+function Test-VolumePython {
+    param(
+        [string]$PythonPath
+    )
+
+    if (-not (Test-Path $PythonPath)) {
+        return $false
+    }
+
+    & $PythonPath --version *> $null
+    return ($LASTEXITCODE -eq 0)
+}
+
 function New-VolumeVenv {
     param(
         [string]$TargetPath,
         [string]$ExpectedPython
     )
 
+    $localPython = Join-Path $env:LocalAppData "Programs\Python\Python312\python.exe"
+
     $attempts = @(
+        @{ Label = "LocalAppData Python312"; Command = $localPython; Args = @("-m", "venv", $TargetPath) },
         @{ Label = "C:\python314\python.exe"; Command = "C:\python314\python.exe"; Args = @("-m", "venv", $TargetPath) },
         @{ Label = "py -3"; Command = "py"; Args = @("-3", "-m", "venv", $TargetPath) },
         @{ Label = "python"; Command = "python"; Args = @("-m", "venv", $TargetPath) },
@@ -36,10 +52,16 @@ function New-VolumeVenv {
     return $false
 }
 
-if (-not (Test-Path $venvPython)) {
-    Write-Host "Ambiente virtual local nao encontrado. Criando em $venvDir ..." -ForegroundColor Yellow
+if (-not (Test-VolumePython -PythonPath $venvPython)) {
+    if (Test-Path $venvDir) {
+        Write-Host "Ambiente virtual existente esta invalido. Recriando em $venvDir ..." -ForegroundColor Yellow
+        Remove-Item -Path $venvDir -Recurse -Force -ErrorAction SilentlyContinue
+    } else {
+        Write-Host "Ambiente virtual local nao encontrado. Criando em $venvDir ..." -ForegroundColor Yellow
+    }
+
     $created = New-VolumeVenv -TargetPath $venvDir -ExpectedPython $venvPython
-    if (-not $created) {
+    if (-not $created -or -not (Test-VolumePython -PythonPath $venvPython)) {
         Write-Host "Nao foi possivel criar o .venv do Volume." -ForegroundColor Red
         Write-Host "Instale Python 3 e tente novamente." -ForegroundColor Red
         exit 1
@@ -50,7 +72,7 @@ if (-not $env:VOLUME_BIND_HOST) {
     $env:VOLUME_BIND_HOST = "0.0.0.0"
 }
 if (-not $env:VOLUME_PUBLIC_HOST) {
-    $env:VOLUME_PUBLIC_HOST = "util.local"
+    $env:VOLUME_PUBLIC_HOST = "volume.local"
 }
 if (-not $env:VOLUME_PORT) {
     $env:VOLUME_PORT = "6100"
@@ -62,7 +84,7 @@ if (-not $env:VOLUME_SERVER_NAME) {
     $env:VOLUME_SERVER_NAME = $env:VOLUME_PUBLIC_HOST
 }
 if (-not $env:VOLUME_TRUSTED_HOSTS) {
-    $env:VOLUME_TRUSTED_HOSTS = "util.local,util.local:6100,volume.local,volume.local:6100"
+    $env:VOLUME_TRUSTED_HOSTS = "volume.local,volume.local:6100"
 }
 
 if (-not $env:VOLUME_DEBUG) {

@@ -1,5 +1,5 @@
 param(
-    [string]$HostName = "util.local",
+    [string]$HostName = "volume.local",
     [string]$TargetIp = "127.0.0.1"
 )
 

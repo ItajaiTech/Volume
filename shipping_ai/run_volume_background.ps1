@@ -22,7 +22,7 @@ if (-not $env:VOLUME_BIND_HOST) {
     $env:VOLUME_BIND_HOST = "0.0.0.0"
 }
 if (-not $env:VOLUME_PUBLIC_HOST) {
-    $env:VOLUME_PUBLIC_HOST = "util.local"
+    $env:VOLUME_PUBLIC_HOST = "volume.local"
 }
 
 $existingListener = Get-NetTCPConnection -LocalPort 6100 -State Listen -ErrorAction SilentlyContinue

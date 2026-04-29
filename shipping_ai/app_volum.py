@@ -89,7 +89,7 @@ def form_checkbox_to_int(form_data, key):
 
 APP_PORT = safe_int_env("VOLUME_PORT", 6100)
 APP_HOST = os.getenv("VOLUME_BIND_HOST", os.getenv("VOLUME_HOST", "0.0.0.0"))
-APP_PUBLIC_HOST = os.getenv("VOLUME_PUBLIC_HOST", "util.local")
+APP_PUBLIC_HOST = os.getenv("VOLUME_PUBLIC_HOST", "volume.local")
 APP_SERVER_NAME = os.getenv("VOLUME_SERVER_NAME", f"{APP_PUBLIC_HOST}:{APP_PORT}")
 APP_DEBUG = safe_bool_env("VOLUME_DEBUG", True)
 DEFAULT_BOXES_XLSX = os.getenv(
@@ -127,7 +127,6 @@ for raw_host in [
     APP_PUBLIC_HOST,
     APP_SERVER_NAME,
     "volume.local",
-    "util.local",
     ".local",
     "127.0.0.1",
     f"127.0.0.1:{APP_PORT}",

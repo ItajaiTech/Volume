@@ -11,8 +11,8 @@ from cryptography.x509.oid import NameOID
 
 BASE_DIR = Path(__file__).resolve().parent
 CERTS_DIR = BASE_DIR / "certs"
-KEY_FILE = CERTS_DIR / "util.local.key"
-CERT_FILE = CERTS_DIR / "util.local.crt"
+KEY_FILE = CERTS_DIR / "volume.local.key"
+CERT_FILE = CERTS_DIR / "volume.local.crt"
 
 
 def build_san_entries(hosts):
@@ -30,7 +30,7 @@ def build_san_entries(hosts):
 
 def generate_certificate(hosts=None):
     if hosts is None:
-        hosts = ["util.local", "volume.local", "localhost", "127.0.0.1"]
+        hosts = ["volume.local", "localhost", "127.0.0.1"]
 
     CERTS_DIR.mkdir(parents=True, exist_ok=True)
 
