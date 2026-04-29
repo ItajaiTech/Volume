@@ -1,11 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Volume">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Caixa de embalagem">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0f766e"/>
-      <stop offset="100%" stop-color="#1d4ed8"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#b45309"/>
+      <stop offset="100%" stop-color="#7c2d12"/>
     </linearGradient>
   </defs>
-  <rect x="4" y="4" width="56" height="56" rx="14" fill="url(#g)"/>
-  <path d="M16 40l10-18 6 10 6-10 10 18h-8l-2-4h-12l-2 4z" fill="#ffffff"/>
-  <rect x="26" y="36" width="12" height="4" fill="#ffffff"/>
+
+  <rect x="4" y="4" width="56" height="56" rx="12" fill="url(#bg)"/>
+
+  <path d="M32 14l16 8-16 8-16-8z" fill="#fcd34d"/>
+  <path d="M16 22l16 8v20l-16-8z" fill="#f59e0b"/>
+  <path d="M48 22l-16 8v20l16-8z" fill="#d97706"/>
+
+  <path d="M32 14v16" stroke="#92400e" stroke-width="2"/>
+  <path d="M24 18l16 8" stroke="#92400e" stroke-width="2"/>
 </svg>
