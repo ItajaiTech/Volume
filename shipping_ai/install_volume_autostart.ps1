@@ -1,6 +1,10 @@
 # Registra uma tarefa agendada para manter o Volume disponivel apos reboot e logon.
 $taskName = "VolumeAppBackground"
-$scriptPath = "C:\Volume\shipping_ai\run_volume_background.ps1"
+$appPath = $PSScriptRoot
+if (-not $appPath) {
+    $appPath = Split-Path -Parent $MyInvocation.MyCommand.Path
+}
+$scriptPath = Join-Path $appPath "run_volume_background.ps1"
 
 if (-not (Test-Path $scriptPath)) {
     Write-Host "Script de background nao encontrado: $scriptPath" -ForegroundColor Red
