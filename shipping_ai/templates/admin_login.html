@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="card narrow">
+    <h2>Acesso Administrativo</h2>
+    <form method="post" class="form-grid">
+        <label>Usuario
+            <input type="text" name="username" required>
+        </label>
+        <label>Senha
+            <input type="password" name="password" required>
+        </label>
+        <button type="submit">Entrar</button>
+    </form>
+    <p class="hint">Padrao: admin / admin123 (altere usando as variaveis de ambiente VOLUME_ADMIN_USER e VOLUME_ADMIN_PASS).</p>
+</section>
+{% endblock %}

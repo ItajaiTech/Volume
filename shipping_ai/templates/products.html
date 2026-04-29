@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2>Produtos</h2>
+        <a href="{{ url_for('import_products_route') }}" style="padding: 0.5rem 1rem; background: #166534; color: #ffffff; text-decoration: none; border-radius: 4px;">Importar do Excel</a>
+    </div>
+    <form method="post" class="form-grid cols-3">
+        <label>SKU
+            <input type="text" name="sku" placeholder="Ex.: PRD00040">
+        </label>
+        <label>Nome
+            <input type="text" name="name" required>
+        </label>
+        <label>Comprimento (cm)
+            <input type="number" step="0.01" min="0" name="length_cm" required>
+        </label>
+        <label>Largura (cm)
+            <input type="number" step="0.01" min="0" name="width_cm" required>
+        </label>
+        <label>Altura (cm)
+            <input type="number" step="0.01" min="0" name="height_cm" required>
+        </label>
+        <label>Peso
+            <input type="number" step="0.001" min="0" name="weight" inputmode="decimal" lang="pt-BR" placeholder="Ex.: 0,085" required>
+        </label>
+        <button type="submit">Cadastrar Produto</button>
+    </form>
+
+    <!-- Filtros de Ordenação -->
+    <div style="margin: 1.5rem 0; padding: 1rem; background: #f5f5f5; border-radius: 4px;">
+        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+            <label for="sort_select" style="margin: 0; font-weight: bold;">Ordenar por:</label>
+            <select id="sort_select" onchange="updateSort(this.value)" style="padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;">
+                <option value="" {% if current_sort_by == 'name' %}selected{% endif %}>Nome ↑</option>
+                <option value="sku" {% if current_sort_by == 'sku' %}selected{% endif %}>SKU ↑</option>
+                <option value="id" {% if current_sort_by == 'id' %}selected{% endif %}>ID ↑</option>
+                <option value="length_cm" {% if current_sort_by == 'length_cm' %}selected{% endif %}>Comprimento ↑</option>
+                <option value="width_cm" {% if current_sort_by == 'width_cm' %}selected{% endif %}>Largura ↑</option>
+                <option value="height_cm" {% if current_sort_by == 'height_cm' %}selected{% endif %}>Altura ↑</option>
+                <option value="weight" {% if current_sort_by == 'weight' %}selected{% endif %}>Peso ↑</option>
+            </select>
+            
+            <div style="display: flex; gap: 0.5rem;">
+                <a href="{{ url_for('products', sort_by=current_sort_by, order='ASC') }}" 
+                   style="padding: 0.5rem 1rem; background: {% if current_order == 'ASC' %}#0066cc{% else %}#ccc{% endif %}; color: white; text-decoration: none; border-radius: 4px; cursor: pointer;"
+                   title="Crescente">
+                    ↑ ASC
+                </a>
+                <a href="{{ url_for('products', sort_by=current_sort_by, order='DESC') }}" 
+                   style="padding: 0.5rem 1rem; background: {% if current_order == 'DESC' %}#0066cc{% else %}#ccc{% endif %}; color: white; text-decoration: none; border-radius: 4px; cursor: pointer;"
+                   title="Decrescente">
+                    ↓ DESC
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th><a href="{{ url_for('products', sort_by='id', order='ASC' if current_sort_by != 'id' else ('DESC' if current_order == 'ASC' else 'ASC')) }}" style="color: inherit; text-decoration: none; cursor: pointer;">ID {% if current_sort_by == 'id' %}{{ '↑' if current_order == 'ASC' else '↓' }}{% endif %}</a></th>
+                <th><a href="{{ url_for('products', sort_by='sku', order='ASC' if current_sort_by != 'sku' else ('DESC' if current_order == 'ASC' else 'ASC')) }}" style="color: inherit; text-decoration: none; cursor: pointer;">SKU {% if current_sort_by == 'sku' %}{{ '↑' if current_order == 'ASC' else '↓' }}{% endif %}</a></th>
+                <th><a href="{{ url_for('products', sort_by='name', order='ASC' if current_sort_by != 'name' else ('DESC' if current_order == 'ASC' else 'ASC')) }}" style="color: inherit; text-decoration: none; cursor: pointer;">Nome {% if current_sort_by == 'name' %}{{ '↑' if current_order == 'ASC' else '↓' }}{% endif %}</a></th>
+                <th><a href="{{ url_for('products', sort_by='length_cm', order='ASC' if current_sort_by != 'length_cm' else ('DESC' if current_order == 'ASC' else 'ASC')) }}" style="color: inherit; text-decoration: none; cursor: pointer;">C {% if current_sort_by == 'length_cm' %}{{ '↑' if current_order == 'ASC' else '↓' }}{% endif %}</a></th>
+                <th><a href="{{ url_for('products', sort_by='width_cm', order='ASC' if current_sort_by != 'width_cm' else ('DESC' if current_order == 'ASC' else 'ASC')) }}" style="color: inherit; text-decoration: none; cursor: pointer;">L {% if current_sort_by == 'width_cm' %}{{ '↑' if current_order == 'ASC' else '↓' }}{% endif %}</a></th>
+                <th><a href="{{ url_for('products', sort_by='height_cm', order='ASC' if current_sort_by != 'height_cm' else ('DESC' if current_order == 'ASC' else 'ASC')) }}" style="color: inherit; text-decoration: none; cursor: pointer;">A {% if current_sort_by == 'height_cm' %}{{ '↑' if current_order == 'ASC' else '↓' }}{% endif %}</a></th>
+                <th><a href="{{ url_for('products', sort_by='weight', order='ASC' if current_sort_by != 'weight' else ('DESC' if current_order == 'ASC' else 'ASC')) }}" style="color: inherit; text-decoration: none; cursor: pointer;">Peso {% if current_sort_by == 'weight' %}{{ '↑' if current_order == 'ASC' else '↓' }}{% endif %}</a></th>
+                <th>Acoes</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for p in products %}
+            <tr>
+                <td>{{ p['id'] }}</td>
+                <td>{{ p['sku'] or '-' }}</td>
+                <td>{{ p['name'] }}</td>
+                <td>{{ p['length_cm'] }}</td>
+                <td>{{ p['width_cm'] }}</td>
+                <td>{{ p['height_cm'] }}</td>
+                <td>{{ p['weight'] }}</td>
+                <td>
+                    <a href="{{ url_for('product_edit', product_id=p['id']) }}" style="color: #0066cc; text-decoration: none;">Editar</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="8">Nenhum produto cadastrado.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+<script>
+function updateSort(value) {
+    if (value === "") {
+        value = "name";
+    }
+    globalThis.location.href = "{{ url_for('products') }}" + "?sort_by=" + value + "&order={{ current_order }}";
+}
+</script>
+{% endblock %}

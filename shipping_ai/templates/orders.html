@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="card">
+    <div class="row-between">
+        <h2>Pedidos</h2>
+        <a class="btn" href="{{ url_for('order_new') }}">Criar Novo Pedido</a>
+    </div>
+
+    <table>
+        <thead>
+            <tr><th>ID</th><th>Criado em</th><th>Itens</th><th>Qtd. Total</th><th>Caixa Usada</th><th>Acoes</th></tr>
+        </thead>
+        <tbody>
+        {% for o in orders %}
+            <tr>
+                <td>{{ o['id'] }}</td>
+                <td>{{ o['created_at'] }}</td>
+                <td>{{ o['line_count'] }}</td>
+                <td>{{ o['total_units'] }}</td>
+                <td>{{ o['used_box_name'] or '-' }}</td>
+                <td>
+                    <a href="{{ url_for('order_detail', id=o['id']) }}">Abrir</a>
+                    <span style="margin: 0 0.35rem; color:#94a3b8;">|</span>
+                    <a href="{{ url_for('order_volumetry', order_id=o['id']) }}" style="color:#0369a1; font-weight:600;">Volumetria</a>
+                    <form method="post" action="{{ url_for('order_delete', order_id=o['id']) }}" style="display:inline; margin-left: 0.5rem;" onsubmit="return confirm('Tem certeza que deseja excluir este pedido?');">
+                        <button type="submit" style="background:#b91c1c;">Excluir</button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="6">Nenhum pedido cadastrado.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="card">
+    <h2>Criar Pedido</h2>
+    <form method="post">
+        <table>
+            <thead>
+                <tr><th>SKU</th><th>Produto</th><th>Qtd.</th></tr>
+            </thead>
+            <tbody>
+            {% for p in products %}
+                <tr>
+                    <td>{{ p['sku'] or '-' }}</td>
+                    <td>{{ p['name'] }}</td>
+                    <td>
+                        <input type="number" min="0" name="qty_{{ p['id'] }}" value="0">
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="3">Nenhum produto cadastrado.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit">Criar Pedido</button>
+    </form>
+</section>
+{% endblock %}

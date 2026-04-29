@@ -1,0 +1,8 @@
+box={'name': 'Caixa GG 40x40x60', 'length_cm': 60.0, 'width_cm': 40.0, 'height_cm': 40.0}
+fill=65.62
+placed=5
+1: {'x': 0.0, 'y': 0.0, 'z': 0.0, 'length_cm': 50.0, 'width_cm': 31.5, 'height_cm': 8.0, 'label': 'PRD00115 - MONITOR DE LED 19.5" 75HZ KDVIEW-19.5 KEEPDATA', 'color': '#c149d3'}
+2: {'x': 0.0, 'y': 31.5, 'z': 0.0, 'length_cm': 50.0, 'width_cm': 8.0, 'height_cm': 31.5, 'label': 'PRD00115 - MONITOR DE LED 19.5" 75HZ KDVIEW-19.5 KEEPDATA', 'color': '#c149d3'}
+3: {'x': 0.0, 'y': 0.0, 'z': 8.0, 'length_cm': 50.0, 'width_cm': 31.5, 'height_cm': 8.0, 'label': 'PRD00115 - MONITOR DE LED 19.5" 75HZ KDVIEW-19.5 KEEPDATA', 'color': '#c149d3'}
+4: {'x': 0.0, 'y': 0.0, 'z': 16.0, 'length_cm': 50.0, 'width_cm': 31.5, 'height_cm': 8.0, 'label': 'PRD00115 - MONITOR DE LED 19.5" 75HZ KDVIEW-19.5 KEEPDATA', 'color': '#c149d3'}
+5: {'x': 0.0, 'y': 0.0, 'z': 24.0, 'length_cm': 50.0, 'width_cm': 31.5, 'height_cm': 8.0, 'label': 'PRD00115 - MONITOR DE LED 19.5" 75HZ KDVIEW-19.5 KEEPDATA', 'color': '#c149d3'}

@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2>Embalagens</h2>
+        <form method="post" action="{{ url_for('boxes_reimport_default') }}" style="margin: 0;">
+            <button type="submit" style="background: #0f766e;">Reimportar Caixas.xlsx</button>
+        </form>
+    </div>
+    <form method="post" class="form-grid cols-3">
+        <label>Nome
+            <input type="text" name="name" required>
+        </label>
+        <label>Comprimento (cm)
+            <input type="number" step="0.01" min="0" name="length_cm" required>
+        </label>
+        <label>Largura (cm)
+            <input type="number" step="0.01" min="0" name="width_cm" required>
+        </label>
+        <label>Altura (cm)
+            <input type="number" step="0.01" min="0" name="height_cm" required>
+        </label>
+        <label>Peso Maximo
+            <input type="number" step="0.01" min="0" name="max_weight" required>
+        </label>
+        <label style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1.8rem;">
+            <input type="checkbox" name="is_active" value="1" checked>
+            Ativa para recomendacao
+        </label>
+        <button type="submit">Cadastrar Embalagem</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th><th>Nome</th><th>C</th><th>L</th><th>A</th><th>Peso Maximo</th><th>Status</th><th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for b in boxes %}
+            <tr>
+                <td>{{ b['id'] }}</td>
+                <td>{{ b['name'] }}</td>
+                <td>{{ b['length_cm'] }}</td>
+                <td>{{ b['width_cm'] }}</td>
+                <td>{{ b['height_cm'] }}</td>
+                <td>{{ b['max_weight'] }}</td>
+                <td>
+                    {% if b['is_active'] %}
+                        <span style="background: #dcfce7; color: #166534; padding: 0.2rem 0.5rem; border-radius: 999px;">Ativa</span>
+                    {% else %}
+                        <span style="background: #fee2e2; color: #991b1b; padding: 0.2rem 0.5rem; border-radius: 999px;">Inativa</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div style="display: flex; gap: 0.75rem; align-items: center;">
+                        <a href="{{ url_for('box_edit', box_id=b['id']) }}" style="color: #0066cc; text-decoration: none;">Editar</a>
+                        <form method="post" action="{{ url_for('box_toggle_active', box_id=b['id']) }}" style="margin: 0;">
+                            {% if b['is_active'] %}
+                                <button type="submit" style="background: #b91c1c;">Desativar</button>
+                            {% else %}
+                                <button type="submit" style="background: #15803d;">Ativar</button>
+                            {% endif %}
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="8">Nenhuma embalagem cadastrada.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

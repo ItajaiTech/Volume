@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="card">
+    <h2>Importar Produtos do Excel</h2>
+    
+    <div style="margin-bottom: 2rem; padding: 1rem; background: #f0f8ff; border-left: 4px solid #0066cc; border-radius: 4px;">
+        <p><strong>Instruções:</strong></p>
+        <ul>
+            <li>Prepare um arquivo Excel com colunas para: SKU (opcional), Nome, Comprimento, Largura, Altura e Peso</li>
+            <li>Mapeie as colunas do seu arquivo nas configurações abaixo</li>
+            <li>Clique em "Importar" para adicionar os produtos ao sistema</li>
+        </ul>
+    </div>
+    
+    <form method="post" enctype="multipart/form-data" class="form-grid cols-2">
+        <div style="grid-column: 1/-1;">
+            <label>Arquivo Excel (.xlsx ou .xls)
+                <input type="file" name="file" accept=".xlsx,.xls" required>
+            </label>
+        </div>
+        
+        <label>Coluna com SKU (opcional)
+            <input type="text" name="col_sku" value="SKU" placeholder="deixe em branco se não usar">
+        </label>
+        <label>Coluna com Nome do Produto
+            <input type="text" name="col_name" value="Descrição do produto" required>
+        </label>
+        <label>Coluna com Comprimento (cm)
+            <input type="text" name="col_length" value="Comprimento" required>
+        </label>
+        <label>Coluna com Largura (cm)
+            <input type="text" name="col_width" value="Largura" required>
+        </label>
+        <label>Coluna com Altura (cm)
+            <input type="text" name="col_height" value="altura" required>
+        </label>
+        <label>Coluna com Peso
+            <input type="text" name="col_weight" value="Peso" required>
+        </label>
+        
+        <div style="grid-column: 1/-1; display: flex; gap: 1rem;">
+            <button type="submit">Importar Produtos</button>
+            <a href="{{ url_for('products') }}" style="padding: 0.5rem 1rem; background: #666; color: white; text-decoration: none; border-radius: 4px; display: flex; align-items: center;">Cancelar</a>
+        </div>
+    </form>
+</section>
+
+<section class="card" style="margin-top: 2rem;">
+    <h3>Exemplo de Arquivo Excel</h3>
+    <p>Seu arquivo pode ter as seguintes colunas (SKU opcional):</p>
+    <table style="width: 100%; margin-top: 1rem;">
+        <thead>
+            <tr>
+                <th>SKU</th>
+                <th>Descrição do produto</th>
+                <th>Comprimento</th>
+                <th>Largura</th>
+                <th>altura</th>
+                <th>Peso</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>PRD00040</td>
+                <td>CPU Intel i3</td>
+                <td>5.3</td>
+                <td>4.5</td>
+                <td>0.9</td>
+                <td>0.053</td>
+            </tr>
+            <tr>
+                <td>PRD00041</td>
+                <td>SSD 240GB</td>
+                <td>10.0</td>
+                <td>7.0</td>
+                <td>1.0</td>
+                <td>0.050</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+{% endblock %}

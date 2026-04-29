@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="card">
+    <h2>Historico de Expedicoes</h2>
+    <table>
+        <thead>
+            <tr><th>ID</th><th>Pedido</th><th>Embalagem</th><th>Qtd.</th><th>Data do Pedido</th></tr>
+        </thead>
+        <tbody>
+        {% for row in history %}
+            <tr>
+                <td>{{ row['id'] }}</td>
+                <td>#{{ row['order_id'] }}</td>
+                <td>{{ row['box_name'] }}</td>
+                <td>{{ row['quantity'] }}</td>
+                <td>{{ row['created_at'] }}</td>
+            </tr>
+        {% else %}
+            <tr><td colspan="5">Ainda nao ha historico de expedicoes.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

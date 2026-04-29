@@ -1,0 +1,767 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="card">
+    <h2>Pedido #{{ order['id'] }}</h2>
+    <p>Criado em: {{ order['created_at'] }}</p>
+
+    {% if not user_mode %}
+    <div style="margin-bottom:14px;">
+        <a class="btn" href="{{ url_for('order_volumetry', order_id=order['id']) }}" style="background:#0369a1;font-size:0.9rem;">
+            📦 Volumetria Interativa
+        </a>
+        <span class="hint" style="margin-left:8px;">Distribua os itens em embalagens de diferentes dimensões.</span>
+    </div>
+    {% endif %}
+
+    <h3>Itens</h3>
+    <div class="pack-filter-row no-print">
+        <label for="item-pack-filter">Filtrar Itens por Pack</label>
+        <select id="item-pack-filter" onchange="applyItemPackFilter()">
+            <option value="all" selected>Todos</option>
+            <option value="pack">Somente com pack</option>
+            <option value="no-pack">Somente sem pack</option>
+        </select>
+        <span id="item-pack-filter-count" class="hint"></span>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Produto</th>
+                <th>Qtd.</th>
+                <th>Volume Unitario</th>
+                <th>Peso Unitario</th>
+                <th>Perfil Pack</th>
+                {% if not user_mode %}<th class="no-print">Acoes</th>{% endif %}
+            </tr>
+        </thead>
+        <tbody id="order-items-body">
+        {% for item in items %}
+            <tr data-pack-uses="{{ '1' if item.get('pack_profile_uses_pack') else '0' }}" data-pack-profile="{{ item.get('pack_profile') or 'none' }}">
+                <td>{% if item['sku'] %}{{ item['sku'] }} - {% endif %}{{ item['name'] }}</td>
+                <td>{{ item['quantity'] }}</td>
+                <td>{{ '%.2f'|format(item['length_cm'] * item['width_cm'] * item['height_cm']) }} cm3</td>
+                <td>{{ item['weight'] }}</td>
+                <td>
+                    <span class="pack-badge {{ (item.get('pack_profile') or 'none')|replace('_', '-') }}{% if item.get('pack_profile_uses_pack') %} is-pack{% endif %}">{{ item.get('pack_profile_label') or 'Sem pack' }}</span>
+                    {% if item.get('pack_profile_detail') %}
+                        <div class="pack-detail">{{ item.get('pack_profile_detail') }}</div>
+                    {% endif %}
+                </td>
+                {% if not user_mode %}
+                <td class="no-print">
+                    <form method="post" action="{{ url_for('order_item_upsert', order_id=order['id']) }}" class="form-inline">
+                        <input type="hidden" name="product_id" value="{{ item['product_id'] }}">
+                        <input type="number" name="quantity" min="0" step="1" value="{{ item['quantity'] }}" style="width:90px;">
+                        <button type="submit">Atualizar</button>
+                    </form>
+                    <form method="post" action="{{ url_for('order_item_delete', order_id=order['id'], product_id=item['product_id']) }}" class="form-inline" onsubmit="return confirm('Remover este item do pedido?');">
+                        <button type="submit" style="background:#b91c1c;">Remover</button>
+                    </form>
+                </td>
+                {% endif %}
+            </tr>
+        {% else %}
+            <tr class="no-items-row"><td colspan="{% if not user_mode %}6{% else %}5{% endif %}">Nenhum item neste pedido.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% if not user_mode %}
+    <h3>Ajustar Itens do Pedido</h3>
+    <form method="post" action="{{ url_for('order_item_upsert', order_id=order['id']) }}" class="form-inline no-print">
+        <select name="product_id" required>
+            <option value="">Selecione um produto</option>
+            {% for p in products %}
+                <option value="{{ p['id'] }}">{% if p['sku'] %}{{ p['sku'] }} - {% endif %}{{ p['name'] }}</option>
+            {% endfor %}
+        </select>
+        <input type="number" name="quantity" min="0" step="1" placeholder="Quantidade" required>
+        <button type="submit">Adicionar ao Pedido</button>
+    </form>
+    <p class="hint no-print">Use quantidade 0 para remover um item via atualizacao.</p>
+    {% endif %}
+
+    {% if not user_mode %}
+    <h3>Plano de Expedicao</h3>
+    {% if shipments %}
+    <ul>
+        {% for sh in shipments %}
+            <li>{{ sh['box_name'] }} x{{ sh['quantity'] }}</li>
+        {% endfor %}
+    </ul>
+    <p class="hint no-print">Para alterar o plano de expedicao, use a Volumetria Interativa.</p>
+    {% else %}
+    <p>Nenhum plano de expedicao registrado para este pedido.</p>
+    <p class="hint no-print">Defina o plano usando a Volumetria Interativa.</p>
+    {% endif %}
+    {% endif %}
+
+    {% if unknown_items %}
+    <h3>Produtos Desconhecidos (nao encontrados no catalogo)</h3>
+    <ul>
+        {% for x in unknown_items %}
+            <li>
+                {% if x.get('sku') %}SKU {{ x.get('sku') }} - {% endif %}
+                {{ x['product_name'] }} (qtd {{ x['quantity'] }})
+            </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if user_mode and import_debug %}
+    <h3>Conferencia da Importacao (SKU e Quantidade)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>SKU Lido</th>
+                <th>Produto Lido</th>
+                <th>Qtd Lida</th>
+                <th>Produto Mapeado</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for row in import_debug %}
+            <tr>
+                <td>{{ row.get('sku') or '-' }}</td>
+                <td>{{ row.get('product_name') or '-' }}</td>
+                <td>{{ row.get('quantity') }}</td>
+                <td>{{ row.get('mapped_name') or '-' }}</td>
+                <td>
+                    {% if row.get('status') == 'mapeado' %}
+                        Mapeado ({{ row.get('match_source') }})
+                    {% else %}
+                        Nao encontrado
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <h3>{% if shipments and not user_mode %}Resumo do Pedido{% else %}Recomendacao{% endif %}</h3>
+    <div class="recommend-box">
+        <p><strong>Volume Total:</strong> {{ '%.2f'|format(recommendation.totals.total_volume_cm3) }} cm3</p>
+        <p><strong>Peso Total (pecas + embalagens):</strong> {{ '%.2f'|format(recommendation.totals.total_weight_with_packages) }} kg</p>
+        <p class="hint">
+            Pecas: {{ '%.2f'|format(recommendation.totals.total_weight_items) }} kg |
+            Embalagens: {{ '%.2f'|format(recommendation.totals.total_weight_packages) }} kg
+            {% if recommendation.box and recommendation.totals.package_weight_per_box > 0 %}
+                ({{ recommendation.packages_required }} x {{ recommendation.box['name'] }} de {{ '%.2f'|format(recommendation.totals.package_weight_per_box) }} kg)
+            {% endif %}
+        </p>
+
+        {% if shipments and not user_mode %}
+            <p><strong>Plano manual ativo:</strong> a expedicao deste pedido segue as caixas registradas acima.</p>
+            <p class="hint">A recomendacao automatica foi ocultada para nao conflitar com o plano manual de expedicao. O modelo 3D segue disponivel para conferencia visual.</p>
+        {% elif recommendation.box %}
+
+            <p><strong>Embalagem Sugerida:</strong> {{ recommendation.box['name'] }}</p>
+            <p><strong>Quantidade de Volumes:</strong> {{ recommendation.packages_required }}</p>
+            {% if recommendation.unpack_applied %}
+                <p><strong>Ajuste de Empacotamento:</strong> desmontagem de pack aplicada para caber em 1 volume</p>
+            {% endif %}
+            <p><strong>Confianca:</strong> {{ recommendation.confidence }}%</p>
+            <p><strong>Origem:</strong>
+                {% if recommendation.source == 'history_exact' %}
+                    Historico exato
+                {% elif recommendation.source == 'history_similar' %}
+                    Historico semelhante
+                {% elif recommendation.source == 'algorithm_smallest_single_box' %}
+                    Algoritmo (menor caixa compativel)
+                {% elif recommendation.source == 'algorithm_small_to_large_first_fit' %}
+                    Algoritmo (teste da menor para a maior)
+                {% elif recommendation.source == 'algorithm_mb_default_pack20' %}
+                    Regra MB (pack de 20; caixa MB como padrao acima de 20 und)
+                {% elif recommendation.source == 'algorithm_ssdm2_master_box' %}
+                    Regra SSD M.2 master (Caixa NVME como padrao acima do limite configurado)
+                {% elif recommendation.source == 'algorithm_min_packages' %}
+                    Algoritmo (menor quantidade de volumes)
+                {% elif recommendation.source == 'no_boxes' %}
+                    Sem embalagens cadastradas
+                {% elif recommendation.source == 'no_compatible_box' %}
+                    Sem embalagem compativel
+                {% else %}
+                    {{ recommendation.source }}
+                {% endif %}
+            </p>
+            {% if recommendation.evidence_count %}
+                <p><strong>Evidencia Historica:</strong> {{ recommendation.evidence_count }} expedicoes semelhantes</p>
+            {% endif %}
+
+            {% if recommendation.tested_boxes %}
+                <p><strong>Teste de Caixas (menor para maior):</strong></p>
+                <ul>
+                {% for tb in recommendation.tested_boxes %}
+                    <li>
+                        {{ tb['name'] }}:
+                        {% if tb['status'] == 'coube' %}
+                            coube
+                        {% elif tb['status'] == 'padrao_mb' %}
+                            caixa definida pela regra MB (> 20 und)
+                        {% elif tb['status'] == 'padrao_ssdm2_master' %}
+                            caixa definida pela regra SSD M.2 master
+                        {% elif tb['status'] == 'coube_desmontando_pack' %}
+                            coube (com desmontagem de pack)
+                        {% elif tb['status'] == 'nao_coube_quantidade' %}
+                            nao coube para toda a quantidade (precisa {{ tb['packages_required'] }} volumes)
+                        {% elif tb['status'] == 'nao_coube_dimensao' %}
+                            nao coube por dimensao
+                        {% else %}
+                            nao coube
+                        {% endif %}
+                        {% if tb.get('note') %}
+                            - {{ tb.get('note') }}
+                        {% endif %}
+                    </li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+
+        {% else %}
+            <p>Nenhuma embalagem compativel encontrada considerando dimensoes, peso e volume. Cadastre mais opcoes de embalagens.</p>
+        {% endif %}
+
+        {% if grouped_packing_previews %}
+            <h4>Modelo 3D (simulacao)</h4>
+            <p class="hint">Arraste para girar. Use o scroll do mouse para aproximar/afastar.</p>
+            {% if shipments and not user_mode %}
+                <span style="display:inline-block;margin:0.35rem 0 0.7rem;padding:0.22rem 0.6rem;border-radius:999px;border:1px solid #facc15;background:#fef9c3;color:#854d0e;font-size:0.82rem;font-weight:600;">3D exibido com plano manual ativo</span>
+            {% endif %}
+            {% if packing_previews|length > 1 %}
+                <p><strong>Distribuicao por volume:</strong> {{ packing_previews|length }} embalagens de {{ recommendation.box['name'] }}.</p>
+            {% endif %}
+
+            {% for preview_group in grouped_packing_previews %}
+                {% set packing_preview = preview_group.preview %}
+                <div class="packing3d-shell">
+                    <div class="packing3d-actions no-print">
+                        <button type="button" onclick="printPackingModel()">Print</button>
+                    </div>
+
+                    {% if preview_group.count > 1 %}
+                        <p><strong>{{ preview_group.count }}X 3D</strong> - volumes {{ preview_group.volume_indexes|join(', ') }} de {{ packing_preview.volume_count }}</p>
+                    {% elif packing_previews|length > 1 %}
+                        <p><strong>Volume {{ packing_preview.volume_index }} de {{ packing_preview.volume_count }}</strong></p>
+                    {% endif %}
+
+                    <div id="packing3d-canvas-{{ loop.index0 }}" class="packing3d-canvas"></div>
+                    <script id="packing3d-data-{{ loop.index0 }}" type="application/json">{{ packing_preview|tojson }}</script>
+
+                    <div class="packing3d-stats">
+                        <p><strong>Caixa:</strong> {{ packing_preview.box.name }} ({{ packing_preview.box.length_cm }} x {{ packing_preview.box.width_cm }} x {{ packing_preview.box.height_cm }} cm)</p>
+                        {% if preview_group.count > 1 %}
+                            <p><strong>Visualizacao consolidada:</strong> 1 modelo representa {{ preview_group.count }} volumes identicos.</p>
+                        {% endif %}
+                        <p><strong>Blocos previstos:</strong> {{ packing_preview.total_blocks }}</p>
+                        <p><strong>Blocos posicionados:</strong> {{ packing_preview.placed_blocks }}</p>
+                        <p><strong>Aproveitamento volumetrico:</strong> {{ packing_preview.fill_percent }}%</p>
+                        {% if packing_preview.hidden_blocks %}
+                            <p><strong>Blocos ocultos na visualizacao:</strong> {{ packing_preview.hidden_blocks }} (para manter performance)</p>
+                        {% endif %}
+                        {% if packing_preview.overflow_blocks %}
+                            <p><strong>Blocos nao alocados na simulacao:</strong> {{ packing_preview.overflow_blocks }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="packing3d-legend">
+                        {% for lg in packing_preview.legend %}
+                            <div class="packing3d-legend-item">
+                                <span class="packing3d-dot" style="background: {{ lg.color }};"></span>
+                                <span>
+                                    {{ lg.label }} | blocos: {{ lg.blocks }}
+                                    {% if lg.get('overflow_blocks') %}
+                                        | nao alocados: {{ lg.get('overflow_blocks') }}
+                                    {% endif %}
+                                    | qtd original: {{ lg.original_quantity }}
+                                </span>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    {% if packing_preview.notes %}
+                        <ul>
+                            {% for note in packing_preview.notes %}
+                                <li>{{ note }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    <p class="hint">Observacao: a visualizacao 3D e uma simulacao de arranjo para conferencia visual.</p>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    {% if not user_mode %}
+    <h3>Registrar Expedicao</h3>
+    {% if shipments %}
+    <div class="recommend-box">
+        <p><strong>Expedicao seguindo o plano salvo.</strong></p>
+        <p class="hint">O registro abaixo reflete exatamente o Plano de Expedicao definido acima.</p>
+        <ul>
+            {% for sh in shipments %}
+                <li>{{ sh['box_name'] }} x{{ sh['quantity'] }}</li>
+            {% endfor %}
+        </ul>
+        <p class="hint">Para alterar a expedicao, atualize o Plano de Expedicao ou use a Volumetria Interativa.</p>
+    </div>
+    {% else %}
+    <div class="recommend-box">
+        <p><strong>Nenhum plano de expedicao definido.</strong></p>
+        <p class="hint">Defina o Plano de Expedicao acima para registrar corretamente as embalagens deste pedido.</p>
+    </div>
+    {% endif %}
+
+    <h3>Excluir Pedido</h3>
+    <form method="post" action="{{ url_for('order_delete', order_id=order['id']) }}" onsubmit="return confirm('Tem certeza que deseja excluir este pedido?');">
+        <button type="submit" style="background:#b91c1c;">Excluir Pedido</button>
+    </form>
+    {% endif %}
+</section>
+
+{% if packing_previews %}
+<script>
+(function () {
+    function initPacking3dModel(canvasId, payloadId) {
+    var mount = document.getElementById(canvasId);
+    var payload = document.getElementById(payloadId);
+    if (!mount || !payload) {
+        return;
+    }
+
+    var data = null;
+    try {
+        data = JSON.parse(payload.textContent || "{}");
+    } catch {
+        mount.innerHTML = "Nao foi possivel montar o modelo 3D.";
+        return;
+    }
+
+    var box = data.box || {};
+    var boxL = Number(box.length_cm || 1);
+    var boxW = Number(box.width_cm || 1);
+    var boxH = Number(box.height_cm || 1);
+    var maxDim = Math.max(boxL, boxW, boxH, 1);
+
+    var canvas = document.createElement("canvas");
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
+    canvas.style.display = "block";
+    mount.innerHTML = "";
+    mount.appendChild(canvas);
+
+    var ctx = canvas.getContext("2d");
+    if (!ctx) {
+        mount.innerHTML = "Navegador sem suporte para canvas.";
+        return;
+    }
+
+    var facesDef = [
+        { idx: [0, 1, 2, 3], n: { x: 0, y: 0, z: -1 } },
+        { idx: [4, 5, 6, 7], n: { x: 0, y: 0, z: 1 } },
+        { idx: [0, 1, 5, 4], n: { x: 0, y: -1, z: 0 } },
+        { idx: [1, 2, 6, 5], n: { x: 1, y: 0, z: 0 } },
+        { idx: [2, 3, 7, 6], n: { x: 0, y: 1, z: 0 } },
+        { idx: [3, 0, 4, 7], n: { x: -1, y: 0, z: 0 } },
+    ];
+    var boxEdges = [
+        [0, 1], [1, 2], [2, 3], [3, 0],
+        [4, 5], [5, 6], [6, 7], [7, 4],
+        [0, 4], [1, 5], [2, 6], [3, 7],
+    ];
+
+    var yaw = -0.78;
+    var pitch = 0.56;
+    var zoom = 1;
+    var baseDistance = maxDim * 2.6;
+    var autoRotate = true;
+
+    var isDragging = false;
+    var lastX = 0;
+    var lastY = 0;
+
+    function clamp(v, min, max) {
+        return Math.max(min, Math.min(max, v));
+    }
+
+    function parseHexColor(hex) {
+        if (typeof hex !== "string" || !/^#[0-9a-fA-F]{6}$/.test(hex)) {
+            return { r: 100, g: 116, b: 139 };
+        }
+        return {
+            r: Number.parseInt(hex.slice(1, 3), 16),
+            g: Number.parseInt(hex.slice(3, 5), 16),
+            b: Number.parseInt(hex.slice(5, 7), 16),
+        };
+    }
+
+    function shadeHex(hex, intensity, alpha) {
+        var rgb = parseHexColor(hex);
+        var i = clamp(intensity, 0.25, 1.25);
+        return "rgba(" +
+            Math.round(clamp(rgb.r * i, 0, 255)) + "," +
+            Math.round(clamp(rgb.g * i, 0, 255)) + "," +
+            Math.round(clamp(rgb.b * i, 0, 255)) + "," +
+            clamp(alpha, 0.1, 1) + ")";
+    }
+
+    function rotatePoint(point) {
+        var cosY = Math.cos(yaw);
+        var sinY = Math.sin(yaw);
+        var cosP = Math.cos(pitch);
+        var sinP = Math.sin(pitch);
+
+        var x1 = point.x * cosY - point.y * sinY;
+        var y1 = point.x * sinY + point.y * cosY;
+        var z1 = point.z;
+
+        var y2 = y1 * cosP - z1 * sinP;
+        var z2 = y1 * sinP + z1 * cosP;
+
+        return { x: x1, y: y2, z: z2 };
+    }
+
+    function projectPoint(point, cx, cy, drawScale, cameraDistance) {
+        var denom = cameraDistance - point.y;
+        if (denom < 0.01) {
+            denom = 0.01;
+        }
+        var f = drawScale / denom;
+        return {
+            x: cx + (point.x * f),
+            y: cy - (point.z * f),
+            depth: point.y,
+        };
+    }
+
+    function centeredPoint(x, y, z) {
+        return {
+            x: x - (boxL / 2),
+            y: y - (boxW / 2),
+            z: z - (boxH / 2),
+        };
+    }
+
+    function sanitizePlacement(raw) {
+        var x = clamp(Number(raw.x || 0), 0, boxL);
+        var y = clamp(Number(raw.y || 0), 0, boxW);
+        var z = clamp(Number(raw.z || 0), 0, boxH);
+
+        var maxL = Math.max(0, boxL - x);
+        var maxW = Math.max(0, boxW - y);
+        var maxH = Math.max(0, boxH - z);
+        var length = clamp(Number(raw.length_cm || 0), 0, maxL);
+        var width = clamp(Number(raw.width_cm || 0), 0, maxW);
+        var height = clamp(Number(raw.height_cm || 0), 0, maxH);
+
+        if (length <= 0.001 || width <= 0.001 || height <= 0.001) {
+            return null;
+        }
+
+        return {
+            x: x,
+            y: y,
+            z: z,
+            length_cm: length,
+            width_cm: width,
+            height_cm: height,
+        };
+    }
+
+    function collectProjectedBoxFaces(cx, cy, drawScale, cameraDistance) {
+        var verts3d = cuboidVertices(0, 0, 0, boxL, boxW, boxH).map(rotatePoint);
+        var verts2d = verts3d.map(function (pt) {
+            return projectPoint(pt, cx, cy, drawScale, cameraDistance);
+        });
+
+        var backFaces = [];
+        var frontFaces = [];
+        for (var def of facesDef) {
+            var normal = rotatePoint(def.n);
+            var depth = 0;
+            var pts = [];
+            for (var idx of def.idx) {
+                depth += verts3d[idx].y;
+                pts.push(verts2d[idx]);
+            }
+            depth /= def.idx.length;
+
+            var face = { pts: pts, depth: depth, normal: normal };
+            if (normal.y > 0.02) {
+                frontFaces.push(face);
+            } else {
+                backFaces.push(face);
+            }
+        }
+
+        backFaces.sort(function (a, b) { return a.depth - b.depth; });
+        frontFaces.sort(function (a, b) { return a.depth - b.depth; });
+        return { backFaces: backFaces, frontFaces: frontFaces, verts2d: verts2d };
+    }
+
+    function fillFace(face, fill, stroke, lineWidth) {
+        ctx.beginPath();
+        ctx.moveTo(face.pts[0].x, face.pts[0].y);
+        for (var point of face.pts.slice(1)) {
+            ctx.lineTo(point.x, point.y);
+        }
+        ctx.closePath();
+        ctx.fillStyle = fill;
+        ctx.fill();
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = lineWidth;
+        ctx.stroke();
+    }
+
+    function collectPlacementFaces(placements, cx, cy, drawScale, cameraDistance) {
+        var drawFaces = [];
+        for (var p of placements) {
+            var safePlacement = sanitizePlacement(p);
+            if (!safePlacement) {
+                continue;
+            }
+
+            var vertices = cuboidVertices(
+                safePlacement.x,
+                safePlacement.y,
+                safePlacement.z,
+                safePlacement.length_cm,
+                safePlacement.width_cm,
+                safePlacement.height_cm
+            );
+            var rotated = vertices.map(rotatePoint);
+            var projected = rotated.map(function (pt) {
+                return projectPoint(pt, cx, cy, drawScale, cameraDistance);
+            });
+
+            for (var def of facesDef) {
+                var normal = rotatePoint(def.n);
+                if (normal.y <= 0.02) {
+                    continue;
+                }
+
+                var depth = 0;
+                var pts = [];
+                for (var idx of def.idx) {
+                    depth += rotated[idx].y;
+                    pts.push(projected[idx]);
+                }
+                depth /= def.idx.length;
+
+                var lightIntensity = 0.64 + (0.28 * normal.z) + (0.18 * normal.y);
+                drawFaces.push({
+                    pts: pts,
+                    depth: depth,
+                    fill: shadeHex(p.color, lightIntensity, 0.72),
+                    stroke: shadeHex(p.color, lightIntensity * 0.78, 0.88),
+                });
+            }
+        }
+
+        drawFaces.sort(function (a, b) {
+            return a.depth - b.depth;
+        });
+        return drawFaces;
+    }
+
+    function cuboidVertices(px, py, pz, lx, wy, hz) {
+        var x0 = px;
+        var y0 = py;
+        var z0 = pz;
+        var x1 = px + lx;
+        var y1 = py + wy;
+        var z1 = pz + hz;
+        return [
+            centeredPoint(x0, y0, z0),
+            centeredPoint(x1, y0, z0),
+            centeredPoint(x1, y1, z0),
+            centeredPoint(x0, y1, z0),
+            centeredPoint(x0, y0, z1),
+            centeredPoint(x1, y0, z1),
+            centeredPoint(x1, y1, z1),
+            centeredPoint(x0, y1, z1),
+        ];
+    }
+
+    function resizeCanvasIfNeeded() {
+        var rect = mount.getBoundingClientRect();
+        var dpr = globalThis.devicePixelRatio || 1;
+        var targetW = Math.max(300, Math.round(rect.width * dpr));
+        var targetH = Math.max(200, Math.round(rect.height * dpr));
+        if (canvas.width !== targetW || canvas.height !== targetH) {
+            canvas.width = targetW;
+            canvas.height = targetH;
+        }
+    }
+
+    function drawFrame() {
+        resizeCanvasIfNeeded();
+
+        var width = canvas.width;
+        var height = canvas.height;
+        var cx = width / 2;
+        var cy = height / 2;
+        var drawScale = Math.min(width, height) * 0.85 * zoom;
+        var cameraDistance = baseDistance;
+
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = "#f8fafc";
+        ctx.fillRect(0, 0, width, height);
+
+        var boxRender = collectProjectedBoxFaces(cx, cy, drawScale, cameraDistance);
+        for (var backFace of boxRender.backFaces) {
+            fillFace(backFace, "rgba(15, 23, 42, 0.035)", "rgba(15, 23, 42, 0.12)", 1);
+        }
+
+        var drawFaces = collectPlacementFaces(
+            data.placements || [],
+            cx,
+            cy,
+            drawScale,
+            cameraDistance,
+        );
+
+        for (var face of drawFaces) {
+            fillFace(face, face.fill, face.stroke, 1);
+        }
+
+        for (var frontFace of boxRender.frontFaces) {
+            fillFace(frontFace, "rgba(248, 250, 252, 0.12)", "rgba(15, 23, 42, 0.28)", 1.1);
+        }
+
+        var boxVerts = boxRender.verts2d;
+        ctx.strokeStyle = "#0f172a";
+        ctx.lineWidth = 1.4;
+        for (var edge of boxEdges) {
+            var a = boxVerts[edge[0]];
+            var b = boxVerts[edge[1]];
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+        }
+
+        if (autoRotate) {
+            yaw += 0.003;
+        }
+
+        globalThis.requestAnimationFrame(drawFrame);
+    }
+
+    function stopDrag() {
+        isDragging = false;
+    }
+
+    canvas.addEventListener("pointerdown", function (evt) {
+        isDragging = true;
+        lastX = evt.clientX;
+        lastY = evt.clientY;
+        autoRotate = false;
+        if (canvas.setPointerCapture) {
+            canvas.setPointerCapture(evt.pointerId);
+        }
+    });
+
+    canvas.addEventListener("pointermove", function (evt) {
+        if (!isDragging) {
+            return;
+        }
+        var dx = evt.clientX - lastX;
+        var dy = evt.clientY - lastY;
+        yaw += dx * 0.01;
+        pitch = clamp(pitch + (dy * 0.008), -1.2, 1.2);
+        lastX = evt.clientX;
+        lastY = evt.clientY;
+    });
+
+    canvas.addEventListener("pointerup", stopDrag);
+    canvas.addEventListener("pointercancel", stopDrag);
+    canvas.addEventListener("pointerleave", stopDrag);
+
+    canvas.addEventListener("wheel", function (evt) {
+        evt.preventDefault();
+        var factor = evt.deltaY > 0 ? 0.92 : 1.08;
+        zoom = clamp(zoom * factor, 0.45, 2.8);
+    }, { passive: false });
+
+    if (typeof globalThis.ResizeObserver === "function") {
+        var resizeObserver = new globalThis.ResizeObserver(function () {
+            resizeCanvasIfNeeded();
+        });
+        resizeObserver.observe(mount);
+    }
+
+    drawFrame();
+    }
+
+    var modelIndexes = [{% for preview_group in grouped_packing_previews %}{{ loop.index0 }}{% if not loop.last %}, {% endif %}{% endfor %}];
+    for (var modelIndex of modelIndexes) {
+        initPacking3dModel("packing3d-canvas-" + modelIndex, "packing3d-data-" + modelIndex);
+    }
+})();
+
+function printPackingModel() {
+    globalThis.print();
+}
+</script>
+{% endif %}
+
+<script>
+function applyItemPackFilter() {
+    var filterSelect = document.getElementById("item-pack-filter");
+    var tbody = document.getElementById("order-items-body");
+    var counter = document.getElementById("item-pack-filter-count");
+    if (!filterSelect || !tbody) {
+        return;
+    }
+
+    var mode = filterSelect.value || "all";
+    var rows = tbody.querySelectorAll("tr[data-pack-uses]");
+    var total = 0;
+    var visible = 0;
+
+    for (var row of rows) {
+        total += 1;
+        var usesPack = row.dataset.packUses === "1";
+        var show = true;
+
+        if (mode === "pack") {
+            show = usesPack;
+        } else if (mode === "no-pack") {
+            show = !usesPack;
+        }
+
+        row.hidden = !show;
+        if (show) {
+            visible += 1;
+        }
+    }
+
+    if (counter) {
+        counter.textContent = "Exibindo " + visible + " de " + total + " item(ns).";
+    }
+}
+
+function resetItemPackFilter() {
+    var filterSelect = document.getElementById("item-pack-filter");
+    if (filterSelect) {
+        filterSelect.value = "all";
+    }
+    applyItemPackFilter();
+}
+
+globalThis.addEventListener("DOMContentLoaded", function () {
+    resetItemPackFilter();
+});
+
+globalThis.addEventListener("pageshow", function () {
+    resetItemPackFilter();
+});
+
+globalThis.addEventListener("focus", function () {
+    applyItemPackFilter();
+});
+</script>
+{% endblock %}

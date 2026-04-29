@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="card narrow">
+    <h2>Importacao de Pedido (Usuario)</h2>
+    <p>Envie um arquivo de pedido (PDF ou Excel) com linhas como <code>SKU123 10</code>, <code>10 SKU123</code> ou <code>SKU123 - Produto 10</code>. Para Excel, use colunas <code>sku</code> (opcional), <code>product_name</code> e <code>quantity</code>.</p>
+
+    <form method="post" enctype="multipart/form-data" class="form-grid">
+        <label>Arquivo do Pedido
+            <input type="file" name="order_file" accept=".pdf,.xlsx,.xls" required>
+        </label>
+        <button type="submit">Analisar Embalagem</button>
+    </form>
+</section>
+
+{% if import_error_debug %}
+<section class="card narrow" style="margin-top:1rem;">
+    <h3 style="color:var(--color-error,#c0392b);">Nenhum produto corresponde ao catalogo</h3>
+    <p>O arquivo foi lido mas nenhum item encontrado foi localizado no catalogo de produtos. Veja abaixo o que foi extraido do arquivo e verifique se os SKUs estao cadastrados no sistema.</p>
+
+    {% if parsed_items %}
+    <h4>Itens extraidos do arquivo</h4>
+    <table class="table">
+        <thead><tr><th>SKU extraido</th><th>Nome extraido</th><th>Qtd</th></tr></thead>
+        <tbody>
+        {% for it in parsed_items %}
+        <tr>
+            <td>{{ it.sku or '—' }}</td>
+            <td>{{ it.product_name }}</td>
+            <td>{{ it.quantity }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <h4>Detalhe do mapeamento</h4>
+    <table class="table">
+        <thead><tr><th>SKU enviado</th><th>Nome enviado</th><th>Qtd</th><th>Status</th><th>Produto no catalogo</th></tr></thead>
+        <tbody>
+        {% for row in import_error_debug %}
+        <tr>
+            <td>{{ row.sku or '—' }}</td>
+            <td>{{ row.product_name }}</td>
+            <td>{{ row.quantity }}</td>
+            <td>{% if row.status == 'mapeado' %}<span style="color:green">encontrado</span>{% else %}<span style="color:var(--color-error,#c0392b)">nao encontrado</span>{% endif %}</td>
+            <td>{{ row.mapped_name or '—' }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <p style="margin-top:.5rem;font-size:.85rem;color:#666;">Se o SKU nao aparece acima ou esta incorreto, verifique o cadastro em <strong>Admin &rarr; Produtos</strong>.</p>
+</section>
+{% endif %}
+{% endblock %}

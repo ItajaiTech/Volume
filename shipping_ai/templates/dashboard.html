@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="card">
+    <h2>Painel Administrativo</h2>
+    <div class="stats-grid">
+        <div class="stat-box">
+            <h3>Embalagem Mais Utilizada</h3>
+            {% if stats.most_used_box %}
+                <p>{{ stats.most_used_box['name'] }} ({{ stats.most_used_box['uses'] }} usos)</p>
+            {% else %}
+                <p>Ainda nao ha dados de expedicao.</p>
+            {% endif %}
+        </div>
+        <div class="stat-box">
+            <h3>Volume Medio por Pedido</h3>
+            <p>{{ '%.2f'|format(stats.avg_volume) }} cm3</p>
+        </div>
+    </div>
+
+    <h3>Produtos Mais Enviados</h3>
+    <table>
+        <thead>
+            <tr><th>Produto</th><th>Total de Unidades</th></tr>
+        </thead>
+        <tbody>
+        {% for row in stats.top_products %}
+            <tr>
+                <td>{{ row['name'] }}</td>
+                <td>{{ row['total_qty'] }}</td>
+            </tr>
+        {% else %}
+            <tr><td colspan="2">Ainda nao ha dados de envio por produto.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+<section class="card" style="margin-top: 1.5rem;">
+    <h3>Regras de Empacotamento</h3>
+    <p>Defina como o sistema agrupa SSD M.2, SSD 2.5 e RAM NB/DESK para calcular volumetria e embalagem compativel.</p>
+
+    <form method="post" action="{{ url_for('admin_packing_settings') }}" class="form-grid cols-2 form-packing">
+        <label>SSD M.2 - Unidades por Pack
+            <input type="number" min="1" step="1" name="ssdm2_bundle_qty" value="{{ packing_rules.get('ssdm2_bundle_qty', 10) }}" required>
+        </label>
+        <label>SSD M.2 - Comprimento do Pack (cm)
+            <input type="number" min="0.1" step="0.1" name="ssdm2_bundle_length_cm" value="{{ packing_rules.get('ssdm2_bundle_length_cm', 21.3) }}" required>
+        </label>
+        <label>SSD M.2 - Largura do Pack (cm)
+            <input type="number" min="0.1" step="0.1" name="ssdm2_bundle_width_cm" value="{{ packing_rules.get('ssdm2_bundle_width_cm', 5.0) }}" required>
+        </label>
+        <label>SSD M.2 - Altura do Pack (cm)
+            <input type="number" min="0.1" step="0.1" name="ssdm2_bundle_height_cm" value="{{ packing_rules.get('ssdm2_bundle_height_cm', 9.0) }}" required>
+        </label>
+        <label>SSD M.2 - Qtd Minima para Caixa Master
+            <input type="number" min="1" step="1" name="ssdm2_master_box_qty" value="{{ packing_rules.get('ssdm2_master_box_qty', 250) }}" required>
+        </label>
+        <label>SSD M.2 - Nome da Caixa Master
+            <input type="text" name="ssdm2_default_box_name" value="{{ packing_rules.get('ssdm2_default_box_name', 'Caixa NVME') }}" required>
+        </label>
+
+        <label>SSD 2.5 - Unidades por Bloco
+            <input type="number" min="1" step="1" name="ssd25_bundle_qty" value="{{ packing_rules['ssd25_bundle_qty'] }}" required>
+        </label>
+        <label>SSD 2.5 - Comprimento do Bloco (cm)
+            <input type="number" min="0.1" step="0.1" name="ssd25_bundle_length_cm" value="{{ packing_rules['ssd25_bundle_length_cm'] }}" required>
+        </label>
+        <label>SSD 2.5 - Largura do Bloco (cm)
+            <input type="number" min="0.1" step="0.1" name="ssd25_bundle_width_cm" value="{{ packing_rules['ssd25_bundle_width_cm'] }}" required>
+        </label>
+        <label>SSD 2.5 - Altura do Bloco (cm)
+            <input type="number" min="0.1" step="0.1" name="ssd25_bundle_height_cm" value="{{ packing_rules['ssd25_bundle_height_cm'] }}" required>
+        </label>
+
+        <label>RAM NB - Unidades por Pack
+            <input type="number" min="1" step="1" name="ram_nb_bundle_qty" value="{{ packing_rules['ram_nb_bundle_qty'] }}" required>
+        </label>
+        <label>RAM NB - Qtd Minima para Agrupar
+            <input type="number" min="1" step="1" name="ram_nb_bundle_min_qty" value="{{ packing_rules['ram_nb_bundle_min_qty'] }}" required>
+        </label>
+
+        <label>RAM DESK - Unidades por Pack
+            <input type="number" min="1" step="1" name="ram_desk_bundle_qty" value="{{ packing_rules['ram_desk_bundle_qty'] }}" required>
+        </label>
+        <label>RAM DESK - Qtd Minima para Agrupar
+            <input type="number" min="1" step="1" name="ram_desk_bundle_min_qty" value="{{ packing_rules['ram_desk_bundle_min_qty'] }}" required>
+        </label>
+
+        <label>Limite Minimo de Peso da Caixa (kg)
+            <input type="number" min="0" step="0.1" name="min_effective_max_weight_kg" value="{{ packing_rules['min_effective_max_weight_kg'] }}" required>
+        </label>
+        <button type="submit">Salvar Regras</button>
+    </form>
+</section>
+{% endblock %}

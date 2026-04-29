@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Otimizador Inteligente de Embalagens</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="topbar">
+        <h1>Otimizador Inteligente de Embalagens</h1>
+        <nav>
+            <a href="{{ url_for('user_upload') }}">Area do Usuario</a>
+            {% if session.get('is_admin') %}
+                <a href="{{ url_for('admin_dashboard') }}">Painel</a>
+                <a href="{{ url_for('products') }}">Produtos</a>
+                <a href="{{ url_for('boxes') }}">Embalagens</a>
+                <a href="{{ url_for('orders') }}">Pedidos</a>
+                <a href="{{ url_for('history') }}">Historico</a>
+                <a href="{{ url_for('admin_logout') }}">Sair</a>
+            {% else %}
+                <a href="{{ url_for('admin_login') }}">Acesso Admin</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-list">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

@@ -1,0 +1,661 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+.vol-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+.pkg-grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+}
+.pkg-card {
+    background: #fff;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    transition: border-color 0.2s;
+}
+.pkg-card.status-over {
+    border-color: #fca5a5;
+    background: #fff8f8;
+}
+.pkg-card.status-ok {
+    border-color: #86efac;
+    background: #f8fff8;
+}
+.pkg-card.status-empty {
+    border-color: #e5e7eb;
+}
+.pkg-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.pkg-num-badge {
+    background: #0f172a;
+    color: #fff;
+    border-radius: 999px;
+    padding: 2px 12px;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+.util-bar {
+    height: 10px;
+    border-radius: 5px;
+    background: #e5e7eb;
+    overflow: hidden;
+    margin: 3px 0;
+}
+.util-fill {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 0.25s, background 0.25s;
+}
+.util-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #475569;
+    margin-bottom: 2px;
+}
+.util-section {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid #f1f5f9;
+}
+.fit-status {
+    margin: 8px 0 0;
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+.pkg-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+    font-size: 0.82rem;
+}
+.pkg-table th,
+.pkg-table td {
+    border-bottom: 1px solid #f1f5f9;
+    padding: 5px 6px;
+}
+.pkg-table thead th {
+    background: #f8fafc;
+    font-weight: 600;
+    font-size: 0.78rem;
+    color: #475569;
+}
+.pkg-table .qty-input {
+    width: 64px;
+    padding: 4px 6px;
+    font-size: 0.82rem;
+}
+.quick-fill-btns {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+.btn-xs {
+    background: #e2e8f0;
+    color: #0f172a;
+    border: 0;
+    border-radius: 5px;
+    padding: 2px 7px;
+    font-size: 0.75rem;
+    cursor: pointer;
+}
+.btn-xs:hover { background: #cbd5e1; }
+.btn-danger-sm {
+    background: #b91c1c;
+    color: #fff;
+    border: 0;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+.btn-danger-sm:hover { background: #991b1b; }
+.btn-add-pkg {
+    background: #0f172a;
+    color: #fff;
+    border: 0;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-size: 0.92rem;
+    cursor: pointer;
+}
+.btn-add-pkg:hover { background: #1e293b; }
+.btn-save {
+    background: #16a34a;
+    color: #fff;
+    border: 0;
+    border-radius: 8px;
+    padding: 11px 28px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+.btn-save:hover { background: #15803d; }
+.pool-remaining {
+    font-weight: 700;
+    min-width: 28px;
+    display: inline-block;
+    text-align: center;
+}
+.remaining-ok { color: #16a34a; }
+.remaining-warn { color: #dc2626; }
+.remaining-over { color: #7c3aed; }
+.vol-error-msg {
+    background: #fee2e2;
+    color: #991b1b;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-top: 12px;
+    display: none;
+}
+.box-dims-hint {
+    font-size: 0.77rem;
+    color: #64748b;
+    margin-top: 3px;
+}
+.empty-pkgs-hint {
+    text-align: center;
+    padding: 32px;
+    color: #94a3b8;
+    border: 2px dashed #e2e8f0;
+    border-radius: 12px;
+    font-size: 0.95rem;
+}
+</style>
+
+<section class="card">
+    <div class="vol-page-header">
+        <h2 style="margin:0;">Volumetria Interativa — Pedido #{{ order['id'] }}</h2>
+        <a class="btn" href="{{ url_for('order_detail', id=order['id']) }}" style="font-size:0.9rem;">← Voltar ao Pedido</a>
+    </div>
+    <p class="hint">Distribua os itens do pedido nas embalagens abaixo. O sistema valida volume e peso em tempo real.</p>
+</section>
+
+<!-- Item pool -->
+<section class="card">
+    <h3 style="margin-bottom:8px;">Itens do Pedido</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Produto</th>
+                <th style="text-align:center;">Total</th>
+                <th style="text-align:center;">A distribuir</th>
+                <th style="text-align:right;">Vol. unit. (cm³)</th>
+                <th style="text-align:right;">Peso unit. (kg)</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+            <tr>
+                <td>{% if item['sku'] %}{{ item['sku'] }} — {% endif %}{{ item['name'] }}</td>
+                <td style="text-align:center;">{{ item['quantity'] }}</td>
+                <td style="text-align:center;">
+                    <span class="pool-remaining" id="rem-{{ item['product_id'] }}">{{ item['quantity'] }}</span>
+                </td>
+                <td style="text-align:right;">{{ '%.2f'|format(item['length_cm'] * item['width_cm'] * item['height_cm']) }}</td>
+                <td style="text-align:right;">{{ '%.3f'|format(item['weight']) }}</td>
+            </tr>
+        {% else %}
+            <tr><td colspan="5">Nenhum item neste pedido.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <p class="hint" id="pool-status" style="margin-top:8px;"></p>
+</section>
+
+<!-- Packages builder -->
+<section class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+        <h3 style="margin:0;">Embalagens</h3>
+        <button class="btn-add-pkg" type="button" onclick="addPackage()">+ Adicionar Embalagem</button>
+    </div>
+
+    <div id="packages-container" class="pkg-grid">
+        <div class="empty-pkgs-hint" id="empty-hint">
+            Clique em "Adicionar Embalagem" para começar a distribuir os itens.
+        </div>
+    </div>
+
+    <div class="vol-error-msg" id="vol-error-msg"></div>
+
+    <form id="save-form" method="post" action="{{ url_for('order_volumetry_save', order_id=order['id']) }}" style="margin-top:20px;">
+        <input type="hidden" id="form-data-input" name="volumetry_json">
+        <button class="btn-save" type="button" onclick="submitVolumetry()">Salvar Plano de Embalagem</button>
+        <span class="hint" style="margin-left:10px;">O plano substituirá o histórico de expedição atual do pedido.</span>
+    </form>
+</section>
+
+<script>
+// ─── Data injected from server ───────────────────────────────────────────────
+const ITEMS = {{ items_json | safe }};
+const BOXES = {{ boxes_json | safe }};
+
+// ─── State ───────────────────────────────────────────────────────────────────
+let packages = [];
+let pkgIdCounter = 0;
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    updateRemaining();
+
+    {% if preload_packages %}
+    const preload = {{ preload_packages | safe }};
+    preload.forEach(p => addPackage(p.box_id, p.assignments));
+    {% else %}
+    addPackage();
+    {% endif %}
+});
+
+// ─── Package management ───────────────────────────────────────────────────────
+function addPackage(presetBoxId, presetAssignments) {
+    const id = pkgIdCounter++;
+    const assignments = {};
+    ITEMS.forEach(item => {
+        assignments[item.product_id] = (presetAssignments && presetAssignments[item.product_id] != null)
+            ? presetAssignments[item.product_id] : 0;
+    });
+    const pkg = { id, boxId: presetBoxId || null, boxData: null, assignments };
+
+    if (presetBoxId) {
+        pkg.boxData = BOXES.find(b => b.id == presetBoxId) || null;
+    }
+
+    packages.push(pkg);
+
+    const emptyHint = document.getElementById('empty-hint');
+    if (emptyHint) emptyHint.remove();
+
+    const el = document.createElement('div');
+    el.id = 'pkg-' + id;
+    el.className = 'pkg-card status-empty';
+    document.getElementById('packages-container').appendChild(el);
+
+    rerenderPackage(id);
+    recalcPackage(id);
+    updateRemaining();
+}
+
+function removePackage(id) {
+    packages = packages.filter(p => p.id !== id);
+    const el = document.getElementById('pkg-' + id);
+    if (el) el.remove();
+
+    if (packages.length === 0) {
+        const container = document.getElementById('packages-container');
+        container.innerHTML = '<div class="empty-pkgs-hint" id="empty-hint">Clique em "Adicionar Embalagem" para começar a distribuir os itens.</div>';
+    } else {
+        refreshAllBadges();
+    }
+    updateRemaining();
+}
+
+function refreshAllBadges() {
+    packages.forEach((pkg, idx) => {
+        const badge = document.getElementById('badge-' + pkg.id);
+        if (badge) badge.textContent = 'Embalagem ' + (idx + 1);
+    });
+}
+
+function rerenderPackage(id) {
+    const pkg = packages.find(p => p.id === id);
+    if (!pkg) return;
+
+    const el = document.getElementById('pkg-' + id);
+    if (!el) return;
+
+    const pkgNum = packages.indexOf(pkg) + 1;
+
+    // Box options
+    let boxOptions = '<option value="">— Selecione uma embalagem —</option>';
+    BOXES.forEach(b => {
+        const sel = pkg.boxId == b.id ? 'selected' : '';
+        boxOptions += `<option value="${b.id}" ${sel}
+            data-vol="${b.vol}"
+            data-max-weight="${b.max_weight}"
+            data-l="${b.length_cm}" data-w="${b.width_cm}" data-h="${b.height_cm}">
+            ${b.name}
+        </option>`;
+    });
+
+    // Item rows
+    let itemRows = '';
+    ITEMS.forEach(item => {
+        const qty = pkg.assignments[item.product_id] || 0;
+        const maxQty = item.quantity;
+        itemRows += `
+        <tr>
+            <td>${item.sku ? item.sku + ' — ' : ''}${item.name}</td>
+            <td style="white-space:nowrap;">
+                <input type="number"
+                    class="qty-input"
+                    min="0" max="${maxQty}" step="1"
+                    value="${qty}"
+                    id="qty-${id}-${item.product_id}"
+                    onchange="updateItemQty(${id}, ${item.product_id}, this.value)"
+                    oninput="updateItemQty(${id}, ${item.product_id}, this.value)">
+            </td>
+            <td style="text-align:right;" id="item-vol-${id}-${item.product_id}">—</td>
+            <td style="text-align:right;" id="item-wgt-${id}-${item.product_id}">—</td>
+        </tr>`;
+    });
+
+    // Box dims hint
+    const dimHint = pkg.boxData
+        ? `${pkg.boxData.length_cm} × ${pkg.boxData.width_cm} × ${pkg.boxData.height_cm} cm | Bruto: ${pkg.boxData.empty_weight.toFixed(2)} kg | Capacidade: ${pkg.boxData.max_weight.toFixed(2)} kg`
+        : '';
+
+    el.innerHTML = `
+    <div class="pkg-card-header">
+        <span class="pkg-num-badge" id="badge-${id}">Embalagem ${pkgNum}</span>
+        <button class="btn-danger-sm" type="button" onclick="removePackage(${id})">Remover</button>
+    </div>
+
+    <label style="display:grid;gap:4px;font-size:0.88rem;font-weight:600;color:#1e293b;">
+        Tipo de embalagem
+        <select style="width:100%;" onchange="setBox(${id}, this)">
+            ${boxOptions}
+        </select>
+    </label>
+    <div class="box-dims-hint" id="dims-hint-${id}">${dimHint}</div>
+
+    <div class="quick-fill-btns" style="margin-top:8px;">
+        <span style="font-size:0.75rem;color:#64748b;align-self:center;">Atalhos:</span>
+        <button class="btn-xs" type="button" onclick="autoFillRemaining(${id})">Preencher restantes</button>
+        <button class="btn-xs" type="button" onclick="clearPackage(${id})">Limpar itens</button>
+    </div>
+
+    <div style="margin-top:10px;">
+        <table class="pkg-table">
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th style="text-align:center;">Qtd.</th>
+                    <th style="text-align:right;">Vol. (cm³)</th>
+                    <th style="text-align:right;">Peso (kg)</th>
+                </tr>
+            </thead>
+            <tbody>${itemRows}</tbody>
+        </table>
+    </div>
+
+    <div class="util-section">
+        <div class="util-row">
+            <span>Volume utilizado</span>
+            <span id="vol-label-${id}">0 / — cm³</span>
+        </div>
+        <div class="util-bar"><div class="util-fill" id="vol-bar-${id}" style="width:0%;background:#e5e7eb;"></div></div>
+
+        <div class="util-row" style="margin-top:6px;">
+            <span>Peso utilizado</span>
+            <span id="wgt-label-${id}">0 / — kg</span>
+        </div>
+        <div class="util-bar"><div class="util-fill" id="wgt-bar-${id}" style="width:0%;background:#e5e7eb;"></div></div>
+
+        <p class="fit-status" id="fit-status-${id}"></p>
+    </div>`;
+}
+
+// ─── Box selection ─────────────────────────────────────────────────────────────
+function setBox(pkgId, selectEl) {
+    const pkg = packages.find(p => p.id === pkgId);
+    if (!pkg) return;
+
+    const opt = selectEl.options[selectEl.selectedIndex];
+    if (!opt.value) {
+        pkg.boxId = null;
+        pkg.boxData = null;
+    } else {
+        pkg.boxId = parseInt(opt.value);
+        pkg.boxData = BOXES.find(b => b.id == pkg.boxId) || null;
+    }
+
+    const dimHint = document.getElementById('dims-hint-' + pkgId);
+    if (dimHint) {
+        dimHint.textContent = pkg.boxData
+            ? `${pkg.boxData.length_cm} × ${pkg.boxData.width_cm} × ${pkg.boxData.height_cm} cm | Bruto: ${pkg.boxData.empty_weight.toFixed(2)} kg | Capacidade: ${pkg.boxData.max_weight.toFixed(2)} kg`
+            : '';
+    }
+
+    recalcPackage(pkgId);
+}
+
+// ─── Item quantity ─────────────────────────────────────────────────────────────
+function updateItemQty(pkgId, productId, rawValue) {
+    const pkg = packages.find(p => p.id === pkgId);
+    if (!pkg) return;
+    const qty = Math.max(0, parseInt(rawValue) || 0);
+    pkg.assignments[productId] = qty;
+    recalcPackage(pkgId);
+    updateRemaining();
+}
+
+// ─── Quick fill ────────────────────────────────────────────────────────────────
+function autoFillRemaining(pkgId) {
+    const pkg = packages.find(p => p.id === pkgId);
+    if (!pkg) return;
+
+    ITEMS.forEach(item => {
+        const alreadyInOthers = packages
+            .filter(p => p.id !== pkgId)
+            .reduce((sum, p) => sum + (p.assignments[item.product_id] || 0), 0);
+        const remaining = Math.max(0, item.quantity - alreadyInOthers);
+        pkg.assignments[item.product_id] = remaining;
+
+        const input = document.getElementById(`qty-${pkgId}-${item.product_id}`);
+        if (input) input.value = remaining;
+    });
+
+    recalcPackage(pkgId);
+    updateRemaining();
+}
+
+function clearPackage(pkgId) {
+    const pkg = packages.find(p => p.id === pkgId);
+    if (!pkg) return;
+
+    ITEMS.forEach(item => {
+        pkg.assignments[item.product_id] = 0;
+        const input = document.getElementById(`qty-${pkgId}-${item.product_id}`);
+        if (input) input.value = 0;
+    });
+
+    recalcPackage(pkgId);
+    updateRemaining();
+}
+
+// ─── Recalculate package utilization ─────────────────────────────────────────
+function recalcPackage(pkgId) {
+    const pkg = packages.find(p => p.id === pkgId);
+    if (!pkg) return;
+
+    let totalVol = 0;
+    let totalWeight = 0;
+
+    ITEMS.forEach(item => {
+        const qty = pkg.assignments[item.product_id] || 0;
+        const vol = qty * item.vol_unit;
+        const wgt = qty * item.weight;
+        totalVol += vol;
+        totalWeight += wgt;
+
+        const volCell = document.getElementById(`item-vol-${pkgId}-${item.product_id}`);
+        const wgtCell = document.getElementById(`item-wgt-${pkgId}-${item.product_id}`);
+        if (volCell) volCell.textContent = qty > 0 ? vol.toFixed(2) : '—';
+        if (wgtCell) wgtCell.textContent = qty > 0 ? wgt.toFixed(3) : '—';
+    });
+
+    const hasBox = !!pkg.boxData;
+    const boxVol = hasBox ? pkg.boxData.vol : 0;
+    const boxMaxWeight = hasBox ? pkg.boxData.max_weight : 0;
+
+    const volPct = hasBox && boxVol > 0 ? Math.min(150, (totalVol / boxVol) * 100) : 0;
+    const wgtPct = hasBox && boxMaxWeight > 0 ? Math.min(150, (totalWeight / boxMaxWeight) * 100) : 0;
+
+    // Bars
+    setUtilBar('vol-bar-' + pkgId, volPct);
+    setUtilBar('wgt-bar-' + pkgId, wgtPct);
+
+    // Labels
+    const volLabel = document.getElementById(`vol-label-${pkgId}`);
+    const wgtLabel = document.getElementById(`wgt-label-${pkgId}`);
+    if (volLabel) volLabel.textContent = `${totalVol.toFixed(2)} / ${hasBox ? boxVol.toFixed(2) : '—'} cm³`;
+    if (wgtLabel) wgtLabel.textContent = `${totalWeight.toFixed(3)} / ${hasBox ? boxMaxWeight.toFixed(2) : '—'} kg`;
+
+    // Fit status
+    const statusEl = document.getElementById(`fit-status-${pkgId}`);
+    const card = document.getElementById(`pkg-${pkgId}`);
+    if (statusEl && card) {
+        const isOver = hasBox && (totalVol > boxVol * 1.001 || totalWeight > boxMaxWeight * 1.001);
+        const isEmpty = totalVol === 0;
+
+        if (!hasBox) {
+            statusEl.textContent = '';
+            statusEl.style.color = '';
+            card.className = 'pkg-card status-empty';
+        } else if (isOver) {
+            statusEl.textContent = '⚠ Excede a capacidade da embalagem';
+            statusEl.style.color = '#dc2626';
+            card.className = 'pkg-card status-over';
+        } else if (isEmpty) {
+            statusEl.textContent = 'Embalagem selecionada, nenhum item adicionado';
+            statusEl.style.color = '#9ca3af';
+            card.className = 'pkg-card status-empty';
+        } else {
+            statusEl.textContent = `✓ Cabe na embalagem (${volPct.toFixed(1)}% vol., ${wgtPct.toFixed(1)}% peso)`;
+            statusEl.style.color = '#16a34a';
+            card.className = 'pkg-card status-ok';
+        }
+    }
+}
+
+function setUtilBar(barId, pct) {
+    const bar = document.getElementById(barId);
+    if (!bar) return;
+    const clampedPct = Math.min(100, pct);
+    bar.style.width = clampedPct.toFixed(1) + '%';
+    if (pct > 100) {
+        bar.style.background = '#ef4444';
+    } else if (pct > 85) {
+        bar.style.background = '#f59e0b';
+    } else if (pct > 0) {
+        bar.style.background = '#22c55e';
+    } else {
+        bar.style.background = '#e5e7eb';
+    }
+}
+
+// ─── Pool remaining ────────────────────────────────────────────────────────────
+function updateRemaining() {
+    let allOk = true;
+
+    ITEMS.forEach(item => {
+        const totalAssigned = packages.reduce((sum, pkg) => sum + (pkg.assignments[item.product_id] || 0), 0);
+        const remaining = item.quantity - totalAssigned;
+        const el = document.getElementById(`rem-${item.product_id}`);
+        if (el) {
+            el.textContent = remaining;
+            if (remaining === 0) {
+                el.className = 'pool-remaining remaining-ok';
+            } else if (remaining > 0) {
+                el.className = 'pool-remaining remaining-warn';
+                allOk = false;
+            } else {
+                el.className = 'pool-remaining remaining-over';
+                allOk = false;
+            }
+        }
+    });
+
+    const statusEl = document.getElementById('pool-status');
+    if (statusEl) {
+        if (packages.length === 0) {
+            statusEl.textContent = 'Adicione embalagens para distribuir os itens.';
+            statusEl.style.color = '#6b7280';
+        } else if (allOk) {
+            statusEl.textContent = '✓ Todos os itens estão distribuídos nas embalagens.';
+            statusEl.style.color = '#16a34a';
+        } else {
+            statusEl.textContent = '⚠ Há itens ainda não distribuídos (em vermelho) ou distribuídos em excesso (em roxo).';
+            statusEl.style.color = '#dc2626';
+        }
+    }
+}
+
+// ─── Submit ────────────────────────────────────────────────────────────────────
+function submitVolumetry() {
+    const errEl = document.getElementById('vol-error-msg');
+    errEl.style.display = 'none';
+
+    if (packages.length === 0) {
+        showError('Adicione pelo menos uma embalagem antes de salvar.');
+        return;
+    }
+
+    const unboxed = packages.filter(p => !p.boxId);
+    if (unboxed.length > 0) {
+        showError('Selecione uma embalagem para todos os volumes antes de salvar.');
+        return;
+    }
+
+    const mismatched = ITEMS.filter(item => {
+        const totalAssigned = packages.reduce((sum, p) => sum + (p.assignments[item.product_id] || 0), 0);
+        return totalAssigned !== item.quantity;
+    });
+
+    if (mismatched.length > 0) {
+        const names = mismatched.map(i => (i.sku || i.name)).join(', ');
+        showError(`Distribua todos os itens exatamente. Itens com quantidade incorreta: ${names}`);
+        return;
+    }
+
+    // Verify no package exceeds box capacity
+    const overloaded = packages.filter(pkg => {
+        if (!pkg.boxData) return false;
+        let totalVol = 0, totalWeight = 0;
+        ITEMS.forEach(item => {
+            const qty = pkg.assignments[item.product_id] || 0;
+            totalVol += qty * item.vol_unit;
+            totalWeight += qty * item.weight;
+        });
+        return totalVol > pkg.boxData.vol * 1.001 || totalWeight > pkg.boxData.max_weight * 1.001;
+    });
+
+    if (overloaded.length > 0) {
+        if (!confirm('Atenção: ' + overloaded.length + ' embalagem(ns) excedem a capacidade. Deseja salvar mesmo assim?')) {
+            return;
+        }
+    }
+
+    // Build payload
+    const payload = packages.map(pkg => ({
+        box_id: pkg.boxId,
+        assignments: pkg.assignments
+    }));
+
+    document.getElementById('form-data-input').value = JSON.stringify(payload);
+    document.getElementById('save-form').submit();
+}
+
+function showError(msg) {
+    const errEl = document.getElementById('vol-error-msg');
+    errEl.textContent = msg;
+    errEl.style.display = '';
+    errEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+</script>
+{% endblock %}
