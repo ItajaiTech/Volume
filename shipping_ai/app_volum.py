@@ -6,7 +6,7 @@ from functools import wraps
 from uuid import uuid4
 
 import pandas as pd
-from flask import Flask, flash, redirect, render_template, request, session, url_for
+from flask import Flask, flash, redirect, render_template, request, send_from_directory, session, url_for
 from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.utils import secure_filename
 
@@ -145,6 +145,15 @@ for raw_host in extra_trusted_hosts.split(","):
 app.config["SERVER_NAME"] = APP_SERVER_NAME
 app.config["TRUSTED_HOSTS"] = trusted_hosts
 app.config["PREFERRED_URL_SCHEME"] = APP_URL_SCHEME
+
+
+@app.route("/favicon.ico", methods=["GET"])
+def favicon():
+    return send_from_directory(
+        os.path.join(app.root_path, "static"),
+        "favicon.svg",
+        mimetype="image/svg+xml",
+    )
 
 
 def admin_required(view_func):
