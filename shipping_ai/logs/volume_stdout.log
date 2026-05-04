@@ -1,4 +1,3 @@
-HTTPS com certificado detectado. Desativando Waitress para usar TLS nativo do Flask.
 Atualizando dependencias do Volume...
 Requirement already satisfied: flask in c:\volume\volume\shipping_ai\.venv\lib\site-packages (from -r C:\Volume\Volume\shipping_ai\requirements.txt (line 1)) (3.1.3)
 Requirement already satisfied: pandas in c:\volume\volume\shipping_ai\.venv\lib\site-packages (from -r C:\Volume\Volume\shipping_ai\requirements.txt (line 2)) (3.0.2)
@@ -20,7 +19,5 @@ Requirement already satisfied: cffi>=2.0.0 in c:\volume\volume\shipping_ai\.venv
 Requirement already satisfied: pycparser in c:\volume\volume\shipping_ai\.venv\lib\site-packages (from cffi>=2.0.0->cryptography->-r C:\Volume\Volume\shipping_ai\requirements.txt (line 6)) (3.0)
 Requirement already satisfied: colorama in c:\volume\volume\shipping_ai\.venv\lib\site-packages (from click>=8.1.3->flask->-r C:\Volume\Volume\shipping_ai\requirements.txt (line 1)) (0.4.6)
 Requirement already satisfied: six>=1.5 in c:\volume\volume\shipping_ai\.venv\lib\site-packages (from python-dateutil>=2.8.2->pandas->-r C:\Volume\Volume\shipping_ai\requirements.txt (line 2)) (1.17.0)
-Iniciando Volume em https://volume.local:6100
-Bind interno: https://0.0.0.0:6100
- * Serving Flask app 'app_volum'
- * Debug mode: off
+Iniciando Volume em http://volume.local:6100
+Bind interno: http://0.0.0.0:6100
