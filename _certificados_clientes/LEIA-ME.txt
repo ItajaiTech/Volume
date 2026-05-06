@@ -1,0 +1,38 @@
+PACOTE DE CERTIFICADOS - TODOS OS PROJETOS
+
+Arquivos incluidos para instalar nos clientes:
+- ponto.crt
+- ponto_mobile.crt
+- ponto_mobile_complete.pem
+- util.local.crt
+- volume.local.crt
+
+IMPORTANTE:
+- Nao distribua arquivos .key (chave privada).
+- Este pacote contem somente certificados publicos.
+
+Como instalar automaticamente (recomendado):
+1) Copie esta pasta para o computador cliente.
+2) Abra PowerShell como Administrador.
+3) Execute:
+   powershell -ExecutionPolicy Bypass -File .\INSTALAR_CERTIFICADOS.ps1
+
+Como instalar manualmente:
+1) Clique duplo em cada arquivo .crt/.pem.
+2) Instalar Certificado.
+3) Armazenar em: Autoridades de Certificacao Raiz Confiaveis.
+
+Depois da instalacao:
+- Feche e abra o navegador.
+- Se usar domnios locais (ex.: volume.local), garanta que o hosts do cliente aponta para o IP LAN do servidor.
+
+CONFIGURAR HOSTS NO CLIENTE (RECOMENDADO):
+1) Abra PowerShell como Administrador na mesma pasta.
+2) Execute:
+   powershell -ExecutionPolicy Bypass -File .\CONFIGURAR_HOSTS_CLIENTE.ps1 -ServerIp 192.168.1.10
+
+Dominios configurados por esse script:
+- volume.local
+- ponto.local
+- ponto.admin
+- util.local
