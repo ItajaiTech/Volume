@@ -1,2 +1,3 @@
-2026/05/08-08:37:18.916 4fc8 Creating DB C:\Volume\Volume\.wwebjs_auth\session-rma-zap\Default\Local Storage\leveldb since it was missing.
-2026/05/08-08:37:18.989 4fc8 Reusing MANIFEST C:\Volume\Volume\.wwebjs_auth\session-rma-zap\Default\Local Storage\leveldb/MANIFEST-000001
+2026/05/08-08:49:11.215 7894 Reusing MANIFEST C:\Volume\Volume\.wwebjs_auth\session-rma-zap\Default\Local Storage\leveldb/MANIFEST-000001
+2026/05/08-08:49:11.220 7894 Recovering log #3
+2026/05/08-08:49:11.222 7894 Reusing old log C:\Volume\Volume\.wwebjs_auth\session-rma-zap\Default\Local Storage\leveldb/000003.log 
