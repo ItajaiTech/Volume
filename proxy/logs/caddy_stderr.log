@@ -16,3 +16,5 @@
 {"level":"info","ts":1778070227.094958,"msg":"autosaved config (load with --resume flag)","file":"C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy\\autosave.json"}
 {"level":"info","ts":1778070227.094958,"msg":"serving initial configuration"}
 {"level":"info","ts":1778070227.094958,"logger":"tls","msg":"finished cleaning storage units"}
+{"level":"info","ts":1778156624.7214308,"logger":"tls","msg":"cleaning storage unit","storage":"FileStorage:C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy"}
+{"level":"info","ts":1778156624.729664,"logger":"tls","msg":"finished cleaning storage units"}

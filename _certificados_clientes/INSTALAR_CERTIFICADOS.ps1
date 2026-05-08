@@ -31,12 +31,7 @@ foreach ($file in $certFiles) {
         try {
             Import-Certificate -FilePath $fullPath -CertStoreLocation $store | Out-Null
             Write-Host "OK: $file -> $store" -ForegroundColor Green
-        }
-        catch {
-            Write-Warning "Falha ao importar $file em ${store}: $($_.Exception.Message)"
-        }
-    }
-}
+
 
 Write-Host 'Instalacao concluida.' -ForegroundColor Cyan
 if (-not $isAdmin) {
