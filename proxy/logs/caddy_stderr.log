@@ -20,3 +20,7 @@
 {"level":"info","ts":1778156624.729664,"logger":"tls","msg":"finished cleaning storage units"}
 {"level":"info","ts":1778243022.548997,"logger":"tls","msg":"storage cleaning happened too recently; skipping for now","storage":"FileStorage:C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy","instance":"956fbb0c-69d0-46f4-802e-8f9651cb7204","try_again":1778329422.548997,"try_again_in":86400}
 {"level":"info","ts":1778243022.5500214,"logger":"tls","msg":"finished cleaning storage units"}
+{"level":"info","ts":1778329420.4822464,"logger":"tls","msg":"cleaning storage unit","storage":"FileStorage:C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy"}
+{"level":"info","ts":1778329420.490348,"logger":"tls","msg":"finished cleaning storage units"}
+{"level":"info","ts":1778415818.379963,"logger":"tls","msg":"storage cleaning happened too recently; skipping for now","storage":"FileStorage:C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy","instance":"956fbb0c-69d0-46f4-802e-8f9651cb7204","try_again":1778502218.379963,"try_again_in":86400}
+{"level":"info","ts":1778415818.3822234,"logger":"tls","msg":"finished cleaning storage units"}
