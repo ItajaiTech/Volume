@@ -1,0 +1,15 @@
+﻿{
+  "page": { "width_mm": 210, "height_mm": 297 },
+  "font": { "name": "Helvetica", "size": 9, "line_gap_mm": 1.2 },
+  "fields": {
+    "cliente":   { "x_mm": 10, "y_mm": 47,  "max_width_mm": 120, "size": 10 },
+    "cpf_cnpj":  { "x_mm": 10, "y_mm": 56,  "max_width_mm": 120 },
+    "endereco":  { "x_mm": 10, "y_mm": 63,  "max_width_mm": 120 },
+    "cidade_uf": { "x_mm": 10, "y_mm": 72,  "max_width_mm": 90  },
+    "cep":       { "x_mm": 10, "y_mm": 79,  "max_width_mm": 60  },
+    "pedido":    { "x_mm": 150,"y_mm": 47,  "max_width_mm": 55  },
+    "rastreio":  { "x_mm": 10, "y_mm": 88,  "max_width_mm": 180 },
+    "ns":        { "x_mm": 10, "y_mm": 96,  "max_width_mm": 180, "multiline": true },
+    "obs":       { "x_mm": 10, "y_mm": 110, "max_width_mm": 180, "multiline": true }
+  }
+}
