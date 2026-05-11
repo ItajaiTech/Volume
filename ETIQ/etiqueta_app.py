@@ -24,7 +24,11 @@ PDF_GLOB = "*.pdf"
 def list_pdf_models() -> list[Path]:
     if not MODELS_DIR.exists():
         return []
-    return sorted(MODELS_DIR.glob(PDF_GLOB), key=lambda p: p.name.lower())
+    all_pdfs = sorted(MODELS_DIR.glob(PDF_GLOB), key=lambda p: p.name.lower())
+    # Only consider PDFs that have an explicit per-model layout.
+    # This prevents generating labels over unrelated PDFs (e.g. order documents).
+    valid = [p for p in all_pdfs if (LAYOUTS_DIR / f"{p.stem}.json").exists()]
+    return valid
 
 
 def mm_to_pt(value_mm: float) -> float:
