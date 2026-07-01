@@ -33,7 +33,9 @@ try {
     } catch {
         $runKeyPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
         $runValue = "powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$scriptPath`""
-        New-Item -Path $runKeyPath -Force | Out-Null
+        if (-not (Test-Path $runKeyPath)) {
+            New-Item -Path $runKeyPath -Force | Out-Null
+        }
         Set-ItemProperty -Path $runKeyPath -Name $taskName -Value $runValue -Force
         $registeredMode = "registry"
     }
