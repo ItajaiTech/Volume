@@ -3,6 +3,19 @@ $caddyfile = Join-Path $proxyDir "Caddyfile"
 $logDir = Join-Path $proxyDir "logs"
 $stdoutLog = Join-Path $logDir "caddy_stdout.log"
 $stderrLog = Join-Path $logDir "caddy_stderr.log"
+$localCaddyExe = Join-Path $proxyDir "caddy.exe"
+
+function Get-ProcessSnapshot {
+    if (Get-Command Get-CimInstance -ErrorAction SilentlyContinue) {
+        return Get-CimInstance Win32_Process -ErrorAction SilentlyContinue
+    }
+
+    if (Get-Command Get-WmiObject -ErrorAction SilentlyContinue) {
+        return Get-WmiObject Win32_Process -ErrorAction SilentlyContinue
+    }
+
+    return @()
+}
 
 if (-not (Test-Path $caddyfile)) {
     Write-Host "Caddyfile nao encontrado: $caddyfile" -ForegroundColor Red
@@ -10,8 +23,15 @@ if (-not (Test-Path $caddyfile)) {
 }
 
 $caddyExe = $null
-$cmd = Get-Command caddy -ErrorAction SilentlyContinue
-if ($cmd) {
+$cmd = $null
+$localCmd = Get-Command $localCaddyExe -ErrorAction SilentlyContinue
+if ($localCmd) {
+    $caddyExe = $localCmd.Source
+}
+if (-not $caddyExe) {
+    $cmd = Get-Command caddy -ErrorAction SilentlyContinue
+}
+if ($cmd -and -not $caddyExe) {
     $caddyExe = $cmd.Source
 }
 if (-not $caddyExe) {
@@ -34,7 +54,7 @@ if (-not $caddyExe) {
 
 New-Item -ItemType Directory -Path $logDir -Force | Out-Null
 
-Get-CimInstance Win32_Process -ErrorAction SilentlyContinue |
+Get-ProcessSnapshot |
     Where-Object { $_.Name -match '^caddy(\.exe)?$' } |
     ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
 

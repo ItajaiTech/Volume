@@ -35,7 +35,7 @@ https://ponto.admin {
 }
 
 https://volume.local {
-    tls C:\Volume\Volume\shipping_ai\certs\volume.local.crt C:\Volume\Volume\shipping_ai\certs\volume.local.key
+    tls C:\Volume\shipping_ai\certs\volume.local.crt C:\Volume\shipping_ai\certs\volume.local.key
     reverse_proxy http://127.0.0.1:6100 {
         header_up X-Forwarded-Proto https
     }
