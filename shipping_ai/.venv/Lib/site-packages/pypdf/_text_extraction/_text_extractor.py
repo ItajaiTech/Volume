@@ -45,8 +45,6 @@ class TextExtraction:
     """
 
     def __init__(self) -> None:
-        self._font_width_maps: dict[str, tuple[dict[Any, float], str, float]] = {}
-
         # Text extraction state variables
         self.cm_matrix: list[float] = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0]
         self.tm_matrix: list[float] = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0]
@@ -184,7 +182,9 @@ class TextExtraction:
         )
         if is_str_operands:
             text += text_operands
-            font_widths = sum([font.space_width if x == " " else font.text_width(x) for x in text_operands])
+            font_widths = sum(
+                [font.space_width if x == font.space_char else font.get_text_width(x) for x in text_operands]
+            )
         else:
             text, rtl_dir, font_widths = get_display_str(
                 text,
@@ -288,7 +288,7 @@ class TextExtraction:
         try:
             self.font_resource = self.font_resources[operands[0]]
             self.font = self.fonts[operands[0]]
-        except KeyError:  # font not found
+        except (KeyError, IndexError):  # font not found / operand missing
             self.font_resource = None
             font_descriptor = FontDescriptor()
             self.font = Font(
@@ -310,7 +310,8 @@ class TextExtraction:
         # A special case is a translating only tm:
         # tm = [1, 0, 0, 1, e, f]
         # i.e. tm[4] += tx, tm[5] += ty.
-        tx, ty = float(operands[0]), float(operands[1])
+        tx = float(operands[0]) if len(operands) > 0 else 0.0
+        ty = float(operands[1]) if len(operands) > 1 else 0.0
         self.tm_matrix[4] += tx * self.tm_matrix[0] + ty * self.tm_matrix[2]
         self.tm_matrix[5] += tx * self.tm_matrix[1] + ty * self.tm_matrix[3]
         str_widths = self.compute_str_widths(self._actual_str_size["str_widths"])
@@ -319,7 +320,14 @@ class TextExtraction:
 
     def _handle_tm(self, operands: list[Any]) -> float:
         """Handle Tm (Set text matrix) operation - Table 5.5 page 406."""
-        self.tm_matrix = [float(operand) for operand in operands[:6]]
+        try:
+            tm_matrix = [float(operand) for operand in operands[:6]]
+        except (TypeError, ValueError):
+            tm_matrix = []
+        # Fall back to the identity matrix when Tm carries the wrong number of
+        # operands, mirroring _handle_cm, so the text matrix stays a six-element
+        # list and later positioning operators do not read past its end.
+        self.tm_matrix = tm_matrix if len(tm_matrix) == 6 else [1.0, 0.0, 0.0, 1.0, 0.0, 0.0]
         str_widths = self.compute_str_widths(self._actual_str_size["str_widths"])
         self._actual_str_size["str_widths"] = 0.0
         return str_widths

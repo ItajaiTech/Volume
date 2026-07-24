@@ -29,6 +29,7 @@
 from typing import (
     Any,
     Optional,
+    cast,
 )
 
 from ._base import BooleanObject, NameObject, NumberObject, is_null_or_none
@@ -41,9 +42,9 @@ class ViewerPreferences(DictionaryObject):
     def __init__(self, obj: Optional[DictionaryObject] = None) -> None:
         super().__init__(self)
         if not is_null_or_none(obj):
-            self.update(obj.items())  # type: ignore
+            self.update(obj.items())  # type: ignore[union-attr]
         try:
-            self.indirect_reference = obj.indirect_reference  # type: ignore
+            self.indirect_reference = obj.indirect_reference  # type: ignore[union-attr]
         except AttributeError:
             pass
 
@@ -160,4 +161,4 @@ class ViewerPreferences(DictionaryObject):
 
         cls.enforce = _add_prop_arr("/Enforce", ArrayObject())
 
-        return DictionaryObject.__new__(cls)
+        return cast("ViewerPreferences", DictionaryObject.__new__(cls))
