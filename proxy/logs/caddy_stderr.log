@@ -1,34 +1,18 @@
-{"level":"info","ts":1784202517.3840842,"msg":"maxprocs: Leaving GOMAXPROCS=12: CPU quota undefined"}
-{"level":"info","ts":1784202517.3845966,"msg":"GOMEMLIMIT is updated","GOMEMLIMIT":30823015219,"previous":9223372036854775807}
-{"level":"info","ts":1784202517.3845966,"msg":"using config from file","file":"C:\\Volume\\Volume\\proxy\\Caddyfile"}
-{"level":"info","ts":1784202517.3845966,"msg":"adapted config to JSON","adapter":"caddyfile"}
-{"level":"warn","ts":1784202517.385105,"msg":"Caddyfile input is not formatted; run 'caddy fmt --overwrite' to fix inconsistencies","adapter":"caddyfile","file":"C:\\Volume\\Volume\\proxy\\Caddyfile","line":2}
-{"level":"info","ts":1784202517.3913164,"logger":"admin","msg":"admin endpoint started","address":"localhost:2019","enforce_origin":false,"origins":["//localhost:2019","//[::1]:2019","//127.0.0.1:2019"]}
-{"level":"info","ts":1784202517.3918273,"logger":"tls.cache.maintenance","msg":"started background certificate maintenance","cache":"0x6d52c2c980"}
-{"level":"info","ts":1784202517.392849,"logger":"http.auto_https","msg":"automatic HTTPS is completely disabled for server","server_name":"srv0"}
-{"level":"info","ts":1784202517.392849,"logger":"http.auto_https","msg":"automatic HTTPS is completely disabled for server","server_name":"srv1"}
-{"level":"info","ts":1784202517.3933604,"logger":"http","msg":"enabling HTTP/3 listener","addr":":443"}
-{"level":"info","ts":1784202517.3938699,"logger":"http.log","msg":"server running","name":"srv0","protocols":["h1","h2","h3"]}
-{"level":"warn","ts":1784202517.3938699,"logger":"http","msg":"HTTP/2 skipped because it requires TLS","network":"tcp","addr":":80"}
-{"level":"warn","ts":1784202517.3938699,"logger":"http","msg":"HTTP/3 skipped because it requires TLS","network":"tcp","addr":":80"}
-{"level":"info","ts":1784202517.3959203,"logger":"http.log","msg":"server running","name":"srv1","protocols":["h1","h2","h3"]}
-{"level":"info","ts":1784202517.3959203,"msg":"autosaved config (load with --resume flag)","file":"C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy\\autosave.json"}
-{"level":"info","ts":1784202517.398452,"msg":"serving initial configuration"}
-{"level":"info","ts":1784202517.398452,"logger":"tls","msg":"storage cleaning happened too recently; skipping for now","storage":"FileStorage:C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy","instance":"956fbb0c-69d0-46f4-802e-8f9651cb7204","try_again":1784288917.398452,"try_again_in":86400}
-{"level":"info","ts":1784202517.398452,"logger":"tls","msg":"finished cleaning storage units"}
-{"level":"info","ts":1784288914.812493,"logger":"tls","msg":"cleaning storage unit","storage":"FileStorage:C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy"}
-{"level":"info","ts":1784288914.8193853,"logger":"tls","msg":"finished cleaning storage units"}
-{"level":"info","ts":1784375312.443424,"logger":"tls","msg":"storage cleaning happened too recently; skipping for now","storage":"FileStorage:C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy","instance":"956fbb0c-69d0-46f4-802e-8f9651cb7204","try_again":1784461712.443424,"try_again_in":86400}
-{"level":"info","ts":1784375312.4439268,"logger":"tls","msg":"finished cleaning storage units"}
-{"level":"info","ts":1784461710.1183958,"logger":"tls","msg":"cleaning storage unit","storage":"FileStorage:C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy"}
-{"level":"info","ts":1784461710.1250854,"logger":"tls","msg":"finished cleaning storage units"}
-{"level":"info","ts":1784548107.8115246,"logger":"tls","msg":"storage cleaning happened too recently; skipping for now","storage":"FileStorage:C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy","instance":"956fbb0c-69d0-46f4-802e-8f9651cb7204","try_again":1784634507.8115246,"try_again_in":86400}
-{"level":"info","ts":1784548107.812029,"logger":"tls","msg":"finished cleaning storage units"}
-{"level":"info","ts":1784634505.4908915,"logger":"tls","msg":"cleaning storage unit","storage":"FileStorage:C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy"}
-{"level":"info","ts":1784634505.5006478,"logger":"tls","msg":"finished cleaning storage units"}
-{"level":"info","ts":1784720903.20266,"logger":"tls","msg":"storage cleaning happened too recently; skipping for now","storage":"FileStorage:C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy","instance":"956fbb0c-69d0-46f4-802e-8f9651cb7204","try_again":1784807303.20266,"try_again_in":86400}
-{"level":"info","ts":1784720903.203768,"logger":"tls","msg":"finished cleaning storage units"}
-{"level":"info","ts":1784807300.8752294,"logger":"tls","msg":"cleaning storage unit","storage":"FileStorage:C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy"}
-{"level":"info","ts":1784807300.8835297,"logger":"tls","msg":"finished cleaning storage units"}
-{"level":"info","ts":1784893698.5381293,"logger":"tls","msg":"storage cleaning happened too recently; skipping for now","storage":"FileStorage:C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy","instance":"956fbb0c-69d0-46f4-802e-8f9651cb7204","try_again":1784980098.5381293,"try_again_in":86400}
-{"level":"info","ts":1784893698.5386899,"logger":"tls","msg":"finished cleaning storage units"}
+{"level":"info","ts":1785163051.9450657,"msg":"maxprocs: Leaving GOMAXPROCS=20: CPU quota undefined"}
+{"level":"info","ts":1785163051.9456565,"msg":"GOMEMLIMIT is updated","GOMEMLIMIT":46232834457,"previous":9223372036854775807}
+{"level":"info","ts":1785163051.9462411,"msg":"using config from file","file":"C:\\Volume\\proxy\\Caddyfile"}
+{"level":"info","ts":1785163051.9462411,"msg":"adapted config to JSON","adapter":"caddyfile"}
+{"level":"warn","ts":1785163051.9468467,"msg":"Caddyfile input is not formatted; run 'caddy fmt --overwrite' to fix inconsistencies","adapter":"caddyfile","file":"C:\\Volume\\proxy\\Caddyfile","line":2}
+{"level":"info","ts":1785163051.9772089,"logger":"admin","msg":"admin endpoint started","address":"localhost:2019","enforce_origin":false,"origins":["//localhost:2019","//[::1]:2019","//127.0.0.1:2019"]}
+{"level":"info","ts":1785163051.9783123,"logger":"tls.cache.maintenance","msg":"started background certificate maintenance","cache":"0x256516194700"}
+{"level":"info","ts":1785163052.0425773,"logger":"http.auto_https","msg":"automatic HTTPS is completely disabled for server","server_name":"srv0"}
+{"level":"info","ts":1785163052.0425773,"logger":"http.auto_https","msg":"automatic HTTPS is completely disabled for server","server_name":"srv1"}
+{"level":"info","ts":1785163052.0449,"logger":"http","msg":"enabling HTTP/3 listener","addr":":443"}
+{"level":"info","ts":1785163052.0454779,"logger":"http.log","msg":"server running","name":"srv0","protocols":["h1","h2","h3"]}
+{"level":"warn","ts":1785163052.0461178,"logger":"http","msg":"HTTP/2 skipped because it requires TLS","network":"tcp","addr":":80"}
+{"level":"warn","ts":1785163052.0467072,"logger":"http","msg":"HTTP/3 skipped because it requires TLS","network":"tcp","addr":":80"}
+{"level":"info","ts":1785163052.0467072,"logger":"http.log","msg":"server running","name":"srv1","protocols":["h1","h2","h3"]}
+{"level":"info","ts":1785163052.0484946,"msg":"autosaved config (load with --resume flag)","file":"C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy\\autosave.json"}
+{"level":"info","ts":1785163052.049061,"msg":"serving initial configuration"}
+{"level":"info","ts":1785163052.0832283,"logger":"tls","msg":"cleaning storage unit","storage":"FileStorage:C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy"}
+{"level":"info","ts":1785163052.0866334,"logger":"tls","msg":"finished cleaning storage units"}
