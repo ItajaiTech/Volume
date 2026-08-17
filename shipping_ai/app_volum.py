@@ -1573,20 +1573,23 @@ def order_detail(id):
 
     items_for_view = _attach_pack_profile_to_items(items, effective_rules)
     boxes_rows = list_boxes(DB_PATH)
+    # A volumetria interativa salva a distribuicao por caixa. Quando ela
+    # existir, o modelo 3D deve representar esse plano, e nao a sugestao
+    # automatica calculada a partir do pedido inteiro.
     packing_previews = []
-    if recommendation.get("box"):
+    if shipment_rows:
+        packing_previews = _build_manual_shipment_previews(
+            shipment_rows,
+            items,
+            effective_rules,
+        )
+    elif recommendation.get("box"):
         packing_previews = build_packing_3d_previews(
             items,
             recommendation["box"],
             packages_required=recommendation.get("packages_required", 1),
             packing_rules=effective_rules,
             unpack_plan=recommendation.get("unpack_plan"),
-        )
-    if not packing_previews and shipment_rows:
-        packing_previews = _build_manual_shipment_previews(
-            shipment_rows,
-            items,
-            effective_rules,
         )
     packing_preview = packing_previews[0] if packing_previews else None
     grouped_packing_previews = _group_packing_previews(packing_previews)
@@ -1877,6 +1880,7 @@ def user_order_result(order_id):
         return redirect(url_for("user_upload"))
 
     items = get_order_items(DB_PATH, order_id)
+    shipment_rows = get_shipment_history_by_order(DB_PATH, order_id)
     packing_rules = get_packing_rules(DB_PATH)
     recommendation = build_recommendation(items, packing_rules=packing_rules)
     effective_rules = dict(packing_rules)
@@ -1887,8 +1891,15 @@ def user_order_result(order_id):
         effective_rules["mb_box_height_cm"] = dims["height_cm"]
 
     items_for_view = _attach_pack_profile_to_items(items, effective_rules)
+    # Reabre o pedido com o mesmo modelo 3D definido na volumetria manual.
     packing_previews = []
-    if recommendation.get("box"):
+    if shipment_rows:
+        packing_previews = _build_manual_shipment_previews(
+            shipment_rows,
+            items,
+            effective_rules,
+        )
+    elif recommendation.get("box"):
         packing_previews = build_packing_3d_previews(
             items,
             recommendation["box"],
@@ -1911,7 +1922,7 @@ def user_order_result(order_id):
         grouped_packing_previews=grouped_packing_previews,
         boxes=[],
         products=[],
-        shipments=[],
+        shipments=shipment_rows,
         user_mode=True,
         unknown_items=unknown_items,
         import_debug=import_debug,
