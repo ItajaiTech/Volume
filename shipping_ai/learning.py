@@ -151,3 +151,110 @@ def suggest_box_from_history(db_path, target_items):
         return similar_match
 
     return None
+
+
+def _load_manual_plan_records(db_path):
+    """Carrega pedidos que possuem um plano de expedicao salvo.
+
+    Itens e embalagens sao lidos separadamente para que um pedido com varias
+    caixas nao duplique os itens durante a comparacao.
+    """
+    with get_connection(db_path) as conn:
+        item_rows = conn.execute(
+            """
+            SELECT order_id, product_id, quantity
+            FROM order_items
+            ORDER BY order_id ASC, product_id ASC
+            """
+        ).fetchall()
+        plan_rows = conn.execute(
+            """
+            SELECT order_id, box_id, SUM(COALESCE(quantity, 1)) AS quantity
+            FROM shipment_history
+            GROUP BY order_id, box_id
+            ORDER BY order_id ASC, box_id ASC
+            """
+        ).fetchall()
+
+    records = {}
+    for row in item_rows:
+        order_id = int(row["order_id"])
+        records.setdefault(order_id, {"order_id": order_id, "items": [], "plan": []})
+        records[order_id]["items"].append(
+            {"product_id": int(row["product_id"]), "quantity": int(row["quantity"])}
+        )
+    for row in plan_rows:
+        order_id = int(row["order_id"])
+        if order_id not in records:
+            continue
+        records[order_id]["plan"].append(
+            {"box_id": int(row["box_id"]), "quantity": int(row["quantity"])}
+        )
+
+    return [record for record in records.values() if record["items"] and record["plan"]]
+
+
+def _plan_signature(plan):
+    return tuple(sorted((int(row["box_id"]), int(row["quantity"])) for row in plan))
+
+
+def _target_fits_reference_plan(target_signature, reference_signature):
+    """Evita recomendar sem ajuste um plano que atendia menos itens."""
+    reference_quantities = dict(reference_signature)
+    return all(
+        product_id in reference_quantities and quantity <= reference_quantities[product_id]
+        for product_id, quantity in target_signature
+    )
+
+
+def suggest_plan_from_history(db_path, target_items):
+    """Sugere a distribuicao de caixas de um plano manual semelhante.
+
+    Para pedidos apenas semelhantes, a sugestao so e aceita quando o pedido
+    novo nao possui quantidade maior que a do plano de referencia.
+    """
+    target_signature = build_signature(target_items)
+    if not target_signature:
+        return None
+
+    records = _load_manual_plan_records(db_path)
+    exact_votes = defaultdict(int)
+    similar_votes = defaultdict(float)
+    exact_evidence = 0
+    similar_evidence = 0
+
+    for record in records:
+        reference_signature = build_signature(record["items"])
+        plan_signature = _plan_signature(record["plan"])
+        if reference_signature == target_signature:
+            exact_votes[plan_signature] += 1
+            exact_evidence += 1
+            continue
+
+        similarity = _signature_similarity(target_signature, reference_signature)
+        if similarity < 0.6 or not _target_fits_reference_plan(target_signature, reference_signature):
+            continue
+        similar_votes[plan_signature] += similarity
+        similar_evidence += 1
+
+    if exact_votes:
+        plan_signature, votes = max(exact_votes.items(), key=lambda row: row[1])
+        return {
+            "plan": [{"box_id": box_id, "quantity": quantity} for box_id, quantity in plan_signature],
+            "confidence": int(round((votes / exact_evidence) * 100)),
+            "source": "history_plan_exact",
+            "evidence_count": exact_evidence,
+        }
+
+    if similar_votes:
+        plan_signature, score = max(similar_votes.items(), key=lambda row: row[1])
+        total_score = sum(similar_votes.values())
+        confidence = int(round((score / total_score) * 100)) if total_score else 0
+        return {
+            "plan": [{"box_id": box_id, "quantity": quantity} for box_id, quantity in plan_signature],
+            "confidence": max(50, min(confidence, 95)),
+            "source": "history_plan_similar",
+            "evidence_count": similar_evidence,
+        }
+
+    return None

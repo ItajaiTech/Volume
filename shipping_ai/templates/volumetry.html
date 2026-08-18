@@ -184,6 +184,14 @@
         <a class="btn" href="{{ url_for('order_detail', id=order['id']) }}" style="font-size:0.9rem;">← Voltar ao Pedido</a>
     </div>
     <p class="hint">Distribua os itens do pedido nas embalagens abaixo. O sistema valida volume e peso em tempo real.</p>
+    {% if suggested_plan %}
+    <p class="hint" style="margin-top:8px;padding:10px 12px;border-radius:8px;background:#eff6ff;color:#1e3a8a;">
+        <strong>Plano de referencia carregado:</strong>
+        {% for entry in suggested_plan %}
+            {{ entry.quantity }} {{ entry.box.name }}{% if not loop.last %}, {% endif %}
+        {% endfor %}. Confira a distribuicao dos itens antes de salvar.
+    </p>
+    {% endif %}
 </section>
 
 <!-- Item pool -->

@@ -40,7 +40,7 @@ from database import (
     update_box,
     update_product,
 )
-from learning import suggest_box_from_history
+from learning import suggest_plan_from_history
 from packing import (
     build_packing_3d_previews,
     calculate_order_totals,
@@ -971,9 +971,18 @@ def build_recommendation(order_items, packing_rules=None):
     confidence = algo["confidence"]
     evidence_count = 0
 
-    if not mb_default_applied and not ssdm2_default_applied:
-        history = suggest_box_from_history(DB_PATH, order_items)
-        if history and int(history["box_id"]) == int(algo["box"]["id"]):
+    history_plan = []
+    history = suggest_plan_from_history(DB_PATH, order_items)
+    if history:
+        available_boxes = {int(box["id"]): box for box in boxes}
+        for entry in history["plan"]:
+            box = available_boxes.get(int(entry["box_id"]))
+            if not box:
+                history_plan = []
+                break
+            history_plan.append({"box_id": int(entry["box_id"]), "quantity": int(entry["quantity"]), "box": box})
+
+        if history_plan:
             source = history["source"]
             confidence = history["confidence"]
             evidence_count = history["evidence_count"]
@@ -996,6 +1005,7 @@ def build_recommendation(order_items, packing_rules=None):
         "unpack_applied": bool(algo.get("unpack_applied")),
         "unpack_plan": dict(algo.get("unpack_plan") or {}),
         "mb_box_dims": mb_box_dims,
+        "history_plan": history_plan,
     }
 
 
@@ -1583,6 +1593,12 @@ def order_detail(id):
             items,
             effective_rules,
         )
+    elif recommendation.get("history_plan"):
+        packing_previews = _build_manual_shipment_previews(
+            recommendation["history_plan"],
+            items,
+            effective_rules,
+        )
     elif recommendation.get("box"):
         packing_previews = build_packing_3d_previews(
             items,
@@ -1700,6 +1716,10 @@ def suggest_box(order_id):
         "packages_required": recommendation["packages_required"],
         "confidence": recommendation["confidence"],
         "source": recommendation["source"],
+        "shipment_plan": [
+            {"box_id": entry["box_id"], "box_name": entry["box"]["name"], "quantity": entry["quantity"]}
+            for entry in recommendation.get("history_plan") or []
+        ],
         "totals": recommendation["totals"],
     }
 
@@ -1899,6 +1919,12 @@ def user_order_result(order_id):
             items,
             effective_rules,
         )
+    elif recommendation.get("history_plan"):
+        packing_previews = _build_manual_shipment_previews(
+            recommendation["history_plan"],
+            items,
+            effective_rules,
+        )
     elif recommendation.get("box"):
         packing_previews = build_packing_3d_previews(
             items,
@@ -2037,6 +2063,16 @@ def order_volumetry(order_id):
     items_json = _build_items_json_for_volumetry(items)
     boxes_json = _build_boxes_json_for_volumetry(boxes)
     preload_packages = _build_preload_packages(shipments)
+    suggested_plan = []
+    if not preload_packages:
+        recommendation = build_recommendation(items)
+        suggested_plan = recommendation.get("history_plan") or []
+        if suggested_plan:
+            suggested_packages = []
+            for entry in suggested_plan:
+                for _ in range(max(1, int(entry["quantity"]))):
+                    suggested_packages.append({"box_id": int(entry["box_id"]), "assignments": {}})
+            preload_packages = json.dumps(suggested_packages, ensure_ascii=False)
 
     return render_template(
         "volumetry.html",
@@ -2045,6 +2081,7 @@ def order_volumetry(order_id):
         items_json=items_json,
         boxes_json=boxes_json,
         preload_packages=preload_packages,
+        suggested_plan=suggested_plan,
     )
 
 

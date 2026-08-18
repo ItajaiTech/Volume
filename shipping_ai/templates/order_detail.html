@@ -141,21 +141,38 @@
     </table>
     {% endif %}
 
-    <h3>{% if shipments and not user_mode %}Resumo do Pedido{% else %}Recomendacao{% endif %}</h3>
+    <h3>{% if shipments %}Resumo do Pedido{% else %}Recomendacao{% endif %}</h3>
     <div class="recommend-box">
         <p><strong>Volume Total:</strong> {{ '%.2f'|format(recommendation.totals.total_volume_cm3) }} cm3</p>
         <p><strong>Peso Total (pecas + embalagens):</strong> {{ '%.2f'|format(recommendation.totals.total_weight_with_packages) }} kg</p>
         <p class="hint">
             Pecas: {{ '%.2f'|format(recommendation.totals.total_weight_items) }} kg |
             Embalagens: {{ '%.2f'|format(recommendation.totals.total_weight_packages) }} kg
-            {% if recommendation.box and recommendation.totals.package_weight_per_box > 0 %}
+            {% if not shipments and recommendation.box and recommendation.totals.package_weight_per_box > 0 %}
                 ({{ recommendation.packages_required }} x {{ recommendation.box['name'] }} de {{ '%.2f'|format(recommendation.totals.package_weight_per_box) }} kg)
             {% endif %}
         </p>
 
-        {% if shipments and not user_mode %}
+        {% if shipments %}
             <p><strong>Plano manual ativo:</strong> a expedicao deste pedido segue as caixas registradas acima.</p>
             <p class="hint">A recomendacao automatica foi ocultada para nao conflitar com o plano manual de expedicao. O modelo 3D segue disponivel para conferencia visual.</p>
+        {% elif recommendation.history_plan %}
+            <p><strong>Plano historico sugerido:</strong>
+                {% for entry in recommendation.history_plan %}
+                    {{ entry.quantity }} {{ entry.box.name }}{% if not loop.last %}, {% endif %}
+                {% endfor %}.
+            </p>
+            <p><strong>Confianca:</strong> {{ recommendation.confidence }}%</p>
+            <p><strong>Origem:</strong>
+                {% if recommendation.source == 'history_plan_exact' %}
+                    Plano manual de pedido identico
+                {% else %}
+                    Plano manual de pedido semelhante
+                {% endif %}
+            </p>
+            {% if recommendation.evidence_count %}
+                <p><strong>Evidencia Historica:</strong> {{ recommendation.evidence_count }} plano(s) semelhante(s)</p>
+            {% endif %}
         {% elif recommendation.box %}
 
             <p><strong>Embalagem Sugerida:</strong> {{ recommendation.box['name'] }}</p>
@@ -227,10 +244,16 @@
         {% if grouped_packing_previews %}
             <h4>Modelo 3D (simulacao)</h4>
             <p class="hint">Arraste para girar. Use o scroll do mouse para aproximar/afastar.</p>
-            {% if shipments and not user_mode %}
-                <span style="display:inline-block;margin:0.35rem 0 0.7rem;padding:0.22rem 0.6rem;border-radius:999px;border:1px solid #facc15;background:#fef9c3;color:#854d0e;font-size:0.82rem;font-weight:600;">3D exibido com plano manual ativo</span>
+            {% if shipments or recommendation.history_plan %}
+                <span style="display:inline-block;margin:0.35rem 0 0.7rem;padding:0.22rem 0.6rem;border-radius:999px;border:1px solid #facc15;background:#fef9c3;color:#854d0e;font-size:0.82rem;font-weight:600;">{% if shipments %}3D exibido com plano manual ativo{% else %}3D exibido com plano manual de referencia{% endif %}</span>
             {% endif %}
-            {% if packing_previews|length > 1 %}
+            {% if shipments or recommendation.history_plan %}
+                <p><strong>Distribuicao por volume:</strong>
+                    {% for preview_group in grouped_packing_previews %}
+                        {{ preview_group.count }} {{ preview_group.preview.box.name }}{% if not loop.last %}, {% endif %}
+                    {% endfor %}.
+                </p>
+            {% elif packing_previews|length > 1 %}
                 <p><strong>Distribuicao por volume:</strong> {{ packing_previews|length }} embalagens de {{ recommendation.box['name'] }}.</p>
             {% endif %}
 
