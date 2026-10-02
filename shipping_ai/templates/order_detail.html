@@ -153,6 +153,32 @@
             {% endif %}
         </p>
 
+        {% if recommendation.learning_audit %}
+        {% set audit_labels = {
+            'candidate_validated': 'Referencia validada pelas regras atuais',
+            'products_incompatible': 'Perfis fisicos ou regras de pack diferentes',
+            'quantity_above_reference': 'Quantidade superior a referencia',
+            'similarity_below_limit': 'Similaridade abaixo de 60%',
+            'box_missing_or_inactive': 'Caixa inexistente ou inativa',
+            'physical_or_pack_incompatible': 'Dimensoes ou regra de pack incompativeis',
+            'physical_or_pack_capacity_exceeded': 'Capacidade fisica, peso ou pack excedido',
+            'special_rule_incompatible': 'Regra especial exige outra embalagem',
+            'distribution_unknown': 'Caixas diferentes sem distribuicao de itens conhecida',
+            'invalid_assignments': 'Distribuicao registrada invalida',
+            'incomplete_assignments': 'Distribuicao nao corresponde aos itens do pedido',
+            'current_order_excluded': 'Proprio pedido excluido das evidencias',
+            'empty_package': 'Embalagem sem itens',
+            'invalid_physical_profile': 'Dimensoes ou peso invalidos'
+        } %}
+        <details>
+            <summary>Auditoria do aprendizado ({{ recommendation.learning_audit|length }} referencias)</summary>
+            <p>Confianca: participacao ponderada do plano escolhido entre as evidencias do mesmo nivel. Distribuicoes manuais tem peso 2; registros legados, peso 1.</p>
+            <p>Planos divergentes: {{ recommendation.history_conflicts }}. Pedidos de referencia: {{ recommendation.history_reference_orders|join(', ') }}.</p>
+            <ul>{% for entry in recommendation.learning_audit %}
+                <li>Pedido {{ entry.order_id|default('atual') }}: {{ audit_labels.get(entry.reason, entry.reason) }}{% if entry.similarity is defined %} - similaridade {{ entry.similarity }}{% endif %}</li>
+            {% endfor %}</ul>
+        </details>
+        {% endif %}
         {% if shipments %}
             <p><strong>Plano manual ativo:</strong> a expedicao deste pedido segue as caixas registradas acima.</p>
             <p class="hint">A recomendacao automatica foi ocultada para nao conflitar com o plano manual de expedicao. O modelo 3D segue disponivel para conferencia visual.</p>
@@ -164,7 +190,13 @@
             </p>
             <p><strong>Confianca:</strong> {{ recommendation.confidence }}%</p>
             <p><strong>Origem:</strong>
-                {% if recommendation.source == 'history_plan_exact' %}
+                {% if recommendation.source == 'history_physical_exact' %}
+                    Perfil fisico identico
+                {% elif recommendation.source == 'history_manual_distribution' %}
+                    Distribuicao manual aprendida
+                {% elif recommendation.source == 'history_physical_similar' %}
+                    Perfil fisico semelhante em quantidade
+                {% elif recommendation.source == 'history_plan_exact' %}
                     Plano manual de pedido identico
                 {% else %}
                     Plano manual de pedido semelhante

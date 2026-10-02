@@ -1,4 +1,7 @@
 from collections import defaultdict
+import json
+import math
+from contextlib import closing
 
 from database import get_connection
 
@@ -8,11 +11,10 @@ def build_signature(order_items):
     order_items: iterable with keys product_id and quantity
     returns tuple sorted by product_id: ((pid, qty), ...)
     """
-    parts = []
+    parts = defaultdict(int)
     for item in order_items:
-        parts.append((int(item["product_id"]), int(item["quantity"])))
-    parts.sort(key=lambda x: x[0])
-    return tuple(parts)
+        parts[int(item["product_id"])] += int(item["quantity"])
+    return tuple(sorted(parts.items()))
 
 
 def _signature_similarity(sig_a, sig_b):
@@ -37,7 +39,7 @@ def _signature_similarity(sig_a, sig_b):
 
 
 def _load_order_history_rows(db_path):
-    with get_connection(db_path) as conn:
+    with closing(get_connection(db_path)) as conn:
         return conn.execute(
             """
             SELECT
@@ -159,7 +161,7 @@ def _load_manual_plan_records(db_path):
     Itens e embalagens sao lidos separadamente para que um pedido com varias
     caixas nao duplique os itens durante a comparacao.
     """
-    with get_connection(db_path) as conn:
+    with closing(get_connection(db_path)) as conn:
         item_rows = conn.execute(
             """
             SELECT order_id, product_id, quantity
@@ -195,7 +197,10 @@ def _load_manual_plan_records(db_path):
 
 
 def _plan_signature(plan):
-    return tuple(sorted((int(row["box_id"]), int(row["quantity"])) for row in plan))
+    counts = defaultdict(int)
+    for row in plan:
+        counts[int(row["box_id"])] += int(row["quantity"])
+    return tuple(sorted(counts.items()))
 
 
 def _target_fits_reference_plan(target_signature, reference_signature):
@@ -207,54 +212,197 @@ def _target_fits_reference_plan(target_signature, reference_signature):
     )
 
 
-def suggest_plan_from_history(db_path, target_items):
-    """Sugere a distribuicao de caixas de um plano manual semelhante.
 
-    Para pedidos apenas semelhantes, a sugestao so e aceita quando o pedido
-    novo nao possui quantidade maior que a do plano de referencia.
+def physical_profile(item, packing_rules=None):
+    """Exact physical equivalence including the operational pack family."""
+    from packing import _item_bundle_spec, _is_mb_item, _ram_profile
+    row = dict(item)
+    dims = tuple(sorted(float(row[k]) for k in ('length_cm', 'width_cm', 'height_cm')))
+    weight = float(row['weight'])
+    if any(not math.isfinite(v) or v <= 0 for v in (*dims, weight)):
+        raise ValueError('invalid_physical_profile')
+    row['quantity'] = 1000000  # Identify quantity-dependent families consistently.
+    spec = _item_bundle_spec(row, packing_rules) or {}
+    family = spec.get('profile') or ('mb' if _is_mb_item(row) else _ram_profile(row)) or 'none'
+    return dims, weight, family, spec.get('bundle_qty', 1), tuple(spec.get('dims', ()))
+
+
+def physical_signature(items, rules=None):
+    quantities = defaultdict(int)
+    for item in items:
+        quantities[physical_profile(item, rules)] += int(item['quantity'])
+    return tuple(sorted(quantities.items()))
+
+
+def _remap_packages(packages, products, targets, rules):
+    remaining = {int(i['product_id']): int(i['quantity']) for i in targets}
+    result = []
+    for package in packages:
+        assigned = defaultdict(int)
+        for pid, qty in package['assignments'].items():
+            profile = physical_profile(products[int(pid)], rules)
+            for item in targets:
+                target_id = int(item['product_id'])
+                if physical_profile(item, rules) != profile:
+                    continue
+                take = min(qty, remaining[target_id])
+                assigned[str(target_id)] += take
+                remaining[target_id] -= take
+                qty -= take
+                if not qty:
+                    break
+        assigned = {pid: qty for pid, qty in assigned.items() if qty}
+        if assigned:
+            result.append(dict(box_id=package['box_id'], quantity=1, assignments=assigned))
+    # Preserve the learned distribution and consider additional products only
+    # after assigning their full quantities; the normal capacity validator decides.
+    if result and any(remaining.values()):
+        for pid, qty in remaining.items():
+            if qty:
+                result[-1]['assignments'][str(pid)] = result[-1]['assignments'].get(str(pid), 0) + qty
+    return result if result else None
+
+
+def suggest_plan_from_history(db_path, target_items, packing_rules=None, audit=None, validator=None):
+    """Rank historical evidence and validate every candidate before voting.
+
+    Legacy plans have no proof of operator confirmation. Assignments are the
+    stronger evidence, and are checked for complete coverage before reuse.
     """
-    target_signature = build_signature(target_items)
-    if not target_signature:
+    from database import get_packing_rules
+    rules = packing_rules if packing_rules is not None else get_packing_rules(db_path)
+    audit = audit if audit is not None else []
+    targets = [dict(i) for i in target_items]
+    if validator is None:
+        from database import list_boxes
+        boxes = list_boxes(db_path)
+        validator = lambda plan: validate_history_plan(plan, targets, boxes, rules)
+    if not targets:
         return None
-
-    records = _load_manual_plan_records(db_path)
-    exact_votes = defaultdict(int)
-    similar_votes = defaultdict(float)
-    exact_evidence = 0
-    similar_evidence = 0
-
-    for record in records:
-        reference_signature = build_signature(record["items"])
-        plan_signature = _plan_signature(record["plan"])
-        if reference_signature == target_signature:
-            exact_votes[plan_signature] += 1
-            exact_evidence += 1
+    with closing(get_connection(db_path)) as conn:
+        products = {int(r['id']): dict(r) for r in conn.execute('SELECT * FROM products')}
+        shipments = conn.execute('SELECT * FROM shipment_history ORDER BY order_id, id').fetchall()
+        items = conn.execute('SELECT * FROM order_items').fetchall()
+    orders, histories = defaultdict(list), defaultdict(list)
+    for row in items:
+        pid = int(row['product_id'])
+        if pid in products:
+            orders[int(row['order_id'])].append(dict(products[pid], product_id=pid, quantity=int(row['quantity'])))
+    for row in shipments:
+        histories[int(row['order_id'])].append(dict(row))
+    try:
+        target_physical = physical_signature(targets, rules)
+    except (ValueError, KeyError, TypeError) as exc:
+        audit.append(dict(reason=str(exc)))
+        return None
+    candidates = []
+    current_orders = {int(i['order_id']) for i in targets if 'order_id' in i}
+    for oid, rows in histories.items():
+        if oid in current_orders:
+            audit.append(dict(order_id=oid, reason='current_order_excluded'))
             continue
+        try:
+            reference = physical_signature(orders[oid], rules)
+            manual = all(r.get('assignments_json') for r in rows)
+            packages = []
+            if manual:
+                totals = defaultdict(int)
+                for row in rows:
+                    assigned = json.loads(row['assignments_json'])
+                    if not isinstance(assigned, dict) or int(row['quantity']) != 1:
+                        raise ValueError('invalid_assignments')
+                    for pid, qty in assigned.items():
+                        if str(int(pid)) != str(pid) or type(qty) is not int or qty < 0:
+                            raise ValueError('invalid_assignments')
+                        if qty:
+                            totals[int(pid)] += qty
+                    packages.append(dict(box_id=int(row['box_id']), quantity=1, assignments=assigned))
+                if tuple(sorted(totals.items())) != build_signature(orders[oid]):
+                    raise ValueError('incomplete_assignments')
+            target_map, reference_map = dict(target_physical), dict(reference)
+            overlap = tuple((key, qty) for key, qty in target_physical if key in reference_map)
+            additional = bool(set(target_map) - set(reference_map))
+            if not overlap or not _target_fits_reference_plan(overlap, reference):
+                reason = 'quantity_above_reference' if set(dict(target_physical)) <= set(dict(reference)) else 'products_incompatible'
+                raise ValueError(reason)
+            similarity = _signature_similarity(overlap, reference)
+            if similarity < .6:
+                raise ValueError('similarity_below_limit')
+            exact_sku = build_signature(targets) == build_signature(orders[oid])
+            exact_physical = target_physical == reference
+            rank = 0 if exact_sku and manual else 1 if exact_physical else 2 if manual and additional else 3
+            source = 'history_plan_exact' if exact_sku and manual else 'history_physical_exact' if exact_physical else 'history_manual_distribution' if manual else 'history_physical_similar'
+            plan = _remap_packages(packages, products, targets, rules) if manual else [dict(box_id=int(r['box_id']), quantity=int(r['quantity'])) for r in rows]
+            if not plan:
+                raise ValueError('assignments_incompatible')
+            if validator:
+                reason = validator(plan)
+                if reason:
+                    raise ValueError(reason)
+            candidates.append(dict(rank=rank, source=source, plan=plan, order_id=oid, manual=manual, score=similarity*(2 if manual else 1)))
+            audit.append(dict(order_id=oid, reason='candidate_validated', manual=manual, similarity=round(similarity, 4)))
+        except (ValueError, KeyError, TypeError) as exc:
+            audit.append(dict(order_id=oid, reason=str(exc)))
+    if not candidates:
+        return None
+    rank = min(c['rank'] for c in candidates)
+    candidates = [c for c in candidates if c['rank'] == rank]
+    votes = defaultdict(float)
+    for c in candidates:
+        votes[_plan_signature(c['plan'])] += c['score']
+    winner = max(votes, key=lambda key: (votes[key], key))
+    selected = next(c for c in candidates if _plan_signature(c['plan']) == winner)
+    return dict(plan=selected['plan'], source=selected['source'],
+                confidence=min(round(100*votes[winner]/sum(votes.values())), 100 if rank == 0 else 90 if rank == 2 else 95),
+                evidence_count=len(candidates), conflict_count=len(votes)-1,
+                reference_order_ids=[c['order_id'] for c in candidates],
+                manual_evidence_count=sum(c['manual'] for c in candidates), audit=audit)
 
-        similarity = _signature_similarity(target_signature, reference_signature)
-        if similarity < 0.6 or not _target_fits_reference_plan(target_signature, reference_signature):
-            continue
-        similar_votes[plan_signature] += similarity
-        similar_evidence += 1
-
-    if exact_votes:
-        plan_signature, votes = max(exact_votes.items(), key=lambda row: row[1])
-        return {
-            "plan": [{"box_id": box_id, "quantity": quantity} for box_id, quantity in plan_signature],
-            "confidence": int(round((votes / exact_evidence) * 100)),
-            "source": "history_plan_exact",
-            "evidence_count": exact_evidence,
-        }
-
-    if similar_votes:
-        plan_signature, score = max(similar_votes.items(), key=lambda row: row[1])
-        total_score = sum(similar_votes.values())
-        confidence = int(round((score / total_score) * 100)) if total_score else 0
-        return {
-            "plan": [{"box_id": box_id, "quantity": quantity} for box_id, quantity in plan_signature],
-            "confidence": max(50, min(confidence, 95)),
-            "source": "history_plan_similar",
-            "evidence_count": similar_evidence,
-        }
-
+def validate_history_plan(plan, target_items, boxes, rules=None):
+    """Validate capacity with packing.py; mixed boxes require explicit assignments."""
+    from packing import calculate_order_totals, estimate_packages_for_box, is_box_dimension_compatible
+    if not isinstance(plan, list) or not plan:
+        return 'invalid_plan'
+    for row in plan:
+        if not isinstance(row, dict) or type(row.get('box_id')) is not int or type(row.get('quantity')) is not int:
+            return 'invalid_plan'
+        if 'assignments' in row and (not isinstance(row['assignments'], dict) or any(
+            not str(pid).isdigit() or type(qty) is not int or qty < 0 for pid, qty in row['assignments'].items()
+        )):
+            return 'invalid_assignments'
+    available = {int(b['id']): b for b in boxes if int(dict(b).get('is_active', 1))}
+    targets = {int(i['product_id']): dict(i) for i in target_items}
+    assigned_totals = defaultdict(int)
+    has_assignments = all('assignments' in row for row in plan)
+    if not has_assignments and len({row['box_id'] for row in plan}) > 1:
+        return 'distribution_unknown'
+    for row in plan:
+        box = available.get(int(row['box_id']))
+        if not box:
+            return 'box_missing_or_inactive'
+        if int(row['quantity']) <= 0:
+            return 'invalid_box_quantity'
+        if has_assignments:
+            contents = []
+            for pid, qty in row['assignments'].items():
+                if int(pid) not in targets or type(qty) is not int or qty < 0:
+                    return 'invalid_assignments'
+                if not qty:
+                    continue
+                assigned_totals[int(pid)] += qty
+                contents.append(dict(targets[int(pid)], quantity=qty))
+        else:
+            contents = list(targets.values())
+        if not contents:
+            return 'empty_package'
+        if not is_box_dimension_compatible(contents, box, packing_rules=rules):
+            return 'physical_or_pack_incompatible'
+        totals = calculate_order_totals(contents, packing_rules=rules)
+        estimate = estimate_packages_for_box(totals['total_volume_cm3'], totals['total_weight'], box,
+                                             order_items=contents, packing_rules=rules)
+        capacity = int(row['quantity']) if has_assignments else sum(int(r['quantity']) for r in plan)
+        if not estimate or estimate['packages_required'] > capacity:
+            return 'physical_or_pack_capacity_exceeded'
+    if has_assignments and tuple(sorted(assigned_totals.items())) != build_signature(target_items):
+        return 'incomplete_assignments'
     return None

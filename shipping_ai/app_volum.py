@@ -40,7 +40,8 @@ from database import (
     update_box,
     update_product,
 )
-from learning import suggest_plan_from_history
+from learning import suggest_plan_from_history, validate_history_plan
+from learning_metrics import observe, feedback
 from packing import (
     build_packing_3d_previews,
     calculate_order_totals,
@@ -972,7 +973,19 @@ def build_recommendation(order_items, packing_rules=None):
     evidence_count = 0
 
     history_plan = []
-    history = suggest_plan_from_history(DB_PATH, order_items)
+    learning_audit = []
+    def validate_candidate(plan):
+        reason = validate_history_plan(plan, order_items, boxes, effective_rules)
+        if reason:
+            return reason
+        if mb_default_applied or ssdm2_default_applied:
+            if any(int(row["box_id"]) != int(algo["box"]["id"]) for row in plan):
+                return "special_rule_incompatible"
+        return None
+    history = suggest_plan_from_history(
+        DB_PATH, order_items, packing_rules=effective_rules,
+        audit=learning_audit, validator=validate_candidate,
+    )
     if history:
         available_boxes = {int(box["id"]): box for box in boxes}
         for entry in history["plan"]:
@@ -980,12 +993,18 @@ def build_recommendation(order_items, packing_rules=None):
             if not box:
                 history_plan = []
                 break
-            history_plan.append({"box_id": int(entry["box_id"]), "quantity": int(entry["quantity"]), "box": box})
+            saved_entry = dict(entry, box=box)
+            if "assignments" in entry:
+                saved_entry["assignments_json"] = json.dumps(entry["assignments"])
+            history_plan.append(saved_entry)
 
         if history_plan:
             source = history["source"]
             confidence = history["confidence"]
             evidence_count = history["evidence_count"]
+            algo = dict(algo, box=history_plan[0]["box"],
+                        packages_required=sum(entry["quantity"] for entry in history_plan),
+                        unpack_applied=False, unpack_plan={})
 
     totals_with_breakdown = _with_weight_breakdown(
         totals,
@@ -994,7 +1013,7 @@ def build_recommendation(order_items, packing_rules=None):
         effective_rules,
     )
 
-    return {
+    recommendation = {
         "box": algo["box"],
         "packages_required": algo["packages_required"],
         "confidence": confidence,
@@ -1006,7 +1025,14 @@ def build_recommendation(order_items, packing_rules=None):
         "unpack_plan": dict(algo.get("unpack_plan") or {}),
         "mb_box_dims": mb_box_dims,
         "history_plan": history_plan,
+        "learning_audit": learning_audit,
+        "history_conflicts": history.get("conflict_count", 0) if history else 0,
+        "history_reference_orders": history.get("reference_order_ids", []) if history else [],
     }
+    order_ids = {int(dict(item)["order_id"]) for item in order_items if "order_id" in dict(item)}
+    if len(order_ids) == 1 and not get_shipment_history_by_order(DB_PATH, next(iter(order_ids))):
+        observe(DB_PATH, order_items, recommendation)
+    return recommendation
 
 
 def _attach_pack_profile_to_items(items, packing_rules):
@@ -2071,7 +2097,7 @@ def order_volumetry(order_id):
             suggested_packages = []
             for entry in suggested_plan:
                 for _ in range(max(1, int(entry["quantity"]))):
-                    suggested_packages.append({"box_id": int(entry["box_id"]), "assignments": {}})
+                    suggested_packages.append({"box_id": int(entry["box_id"]), "assignments": entry.get("assignments", {})})
             preload_packages = json.dumps(suggested_packages, ensure_ascii=False)
 
     return render_template(
@@ -2111,6 +2137,9 @@ def order_volumetry_save(order_id):
     # Cada elemento do payload é um pacote físico com box_id e assignments de itens
     shipments = []
     for entry in payload:
+        if not isinstance(entry, dict):
+            flash("Formato de embalagem invalido.", "error")
+            return redirect(url_for("order_volumetry", order_id=order_id))
         box_id_raw = entry.get("box_id")
         assignments_raw = entry.get("assignments", {})
         
@@ -2139,7 +2168,15 @@ def order_volumetry_save(order_id):
         flash("Nenhuma embalagem valida no plano.", "error")
         return redirect(url_for("order_volumetry", order_id=order_id))
 
+    reason = validate_history_plan(
+        shipments, get_order_items(DB_PATH, order_id), list_boxes(DB_PATH), get_packing_rules(DB_PATH)
+    )
+    if reason:
+        flash(f"Distribuicao nao pode ser salva: {reason}.", "error")
+        return redirect(url_for("order_volumetry", order_id=order_id))
+
     replace_shipment_history(DB_PATH, order_id, shipments)
+    feedback(DB_PATH, order_id, get_order_items(DB_PATH, order_id), shipments)
 
     # Construir sumário agrupando por box_id
     box_counts = {}

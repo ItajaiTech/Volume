@@ -1,5 +1,7 @@
 {
-    auto_https off
+    # Keep redirects explicit, but allow `tls internal` to issue and renew the
+    # local certificate for financeiro.local.
+    auto_https disable_redirects
 }
 
 http://ponto.local {
@@ -39,4 +41,25 @@ https://volume.local {
     reverse_proxy http://127.0.0.1:6100 {
         header_up X-Forwarded-Proto https
     }
+}
+
+# FIN / WordPress is served by Apache internally. Caddy owns the public
+# local ports and supplies a locally trusted HTTPS certificate.
+http://financeiro.local:8080 {
+    redir https://financeiro.local:8443{uri} 308
+}
+
+https://financeiro.local:8443 {
+    tls internal
+    reverse_proxy http://127.0.0.1:8081 {
+        header_up Host {http.request.host}:{http.request.port}
+        header_up X-Forwarded-Host {host}
+        header_up X-Forwarded-Proto https
+        header_up X-Forwarded-Port 8443
+    }
+}
+
+# Keeps existing local HTTP addresses working after Apache moves to 8081.
+http://:8080 {
+    reverse_proxy http://127.0.0.1:8081
 }
