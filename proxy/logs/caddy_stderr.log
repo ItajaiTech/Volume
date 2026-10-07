@@ -61,3 +61,13 @@
 {"level":"info","ts":1791345276.946655,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["financeiro.local"],"new_expiration":1791388477}
 {"level":"info","ts":1791371077.0275085,"logger":"tls","msg":"cleaning storage unit","storage":"FileStorage:C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy"}
 {"level":"info","ts":1791371077.0358791,"logger":"tls","msg":"finished cleaning storage units"}
+{"level":"info","ts":1791374076.868427,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["financeiro.local"],"expiration":1791388477,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":14400.131573}
+{"level":"info","ts":1791374076.8722494,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["financeiro.local"],"remaining":14400.1277507}
+{"level":"info","ts":1791374076.8722494,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["financeiro.local"],"remaining":14400.1277507}
+{"level":"info","ts":1791374076.8982322,"logger":"tls.renew","msg":"acquiring lock","identifier":"financeiro.local"}
+{"level":"info","ts":1791374076.901045,"logger":"tls.renew","msg":"lock acquired","identifier":"financeiro.local"}
+{"level":"info","ts":1791374076.9023075,"logger":"tls.renew","msg":"renewing certificate","identifier":"financeiro.local","remaining":14400.0976923}
+{"level":"info","ts":1791374076.9172926,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"financeiro.local","issuer":"local"}
+{"level":"info","ts":1791374076.9179246,"logger":"tls.renew","msg":"releasing lock","identifier":"financeiro.local"}
+{"level":"info","ts":1791374076.918564,"logger":"tls","msg":"reloading managed certificate","identifiers":["financeiro.local"]}
+{"level":"info","ts":1791374076.9310782,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["financeiro.local"],"new_expiration":1791417277}
