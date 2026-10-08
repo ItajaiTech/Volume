@@ -71,3 +71,35 @@
 {"level":"info","ts":1791374076.9179246,"logger":"tls.renew","msg":"releasing lock","identifier":"financeiro.local"}
 {"level":"info","ts":1791374076.918564,"logger":"tls","msg":"reloading managed certificate","identifiers":["financeiro.local"]}
 {"level":"info","ts":1791374076.9310782,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["financeiro.local"],"new_expiration":1791417277}
+{"level":"info","ts":1791402876.8684597,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["financeiro.local"],"expiration":1791417277,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":14400.1315402}
+{"level":"info","ts":1791402876.9298172,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["financeiro.local"],"remaining":14400.070183}
+{"level":"info","ts":1791402876.9298172,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["financeiro.local"],"remaining":14400.070183}
+{"level":"info","ts":1791402876.9556875,"logger":"tls.renew","msg":"acquiring lock","identifier":"financeiro.local"}
+{"level":"info","ts":1791402876.9582598,"logger":"tls.renew","msg":"lock acquired","identifier":"financeiro.local"}
+{"level":"info","ts":1791402876.9593875,"logger":"tls.renew","msg":"renewing certificate","identifier":"financeiro.local","remaining":14400.0406123}
+{"level":"info","ts":1791402876.9724452,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"financeiro.local","issuer":"local"}
+{"level":"info","ts":1791402876.973094,"logger":"tls.renew","msg":"releasing lock","identifier":"financeiro.local"}
+{"level":"info","ts":1791402876.9736905,"logger":"tls","msg":"reloading managed certificate","identifiers":["financeiro.local"]}
+{"level":"info","ts":1791402876.9898407,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["financeiro.local"],"new_expiration":1791446077}
+{"level":"info","ts":1791431676.8680975,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["financeiro.local"],"expiration":1791446077,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":14400.1319024}
+{"level":"info","ts":1791431676.8735123,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["financeiro.local"],"remaining":14400.1264877}
+{"level":"info","ts":1791431676.874127,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["financeiro.local"],"remaining":14400.1258732}
+{"level":"info","ts":1791431676.8997982,"logger":"tls.renew","msg":"acquiring lock","identifier":"financeiro.local"}
+{"level":"info","ts":1791431676.9027338,"logger":"tls.renew","msg":"lock acquired","identifier":"financeiro.local"}
+{"level":"info","ts":1791431676.9038928,"logger":"tls.renew","msg":"renewing certificate","identifier":"financeiro.local","remaining":14400.0961072}
+{"level":"info","ts":1791431676.9175446,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"financeiro.local","issuer":"local"}
+{"level":"info","ts":1791431676.9181488,"logger":"tls.renew","msg":"releasing lock","identifier":"financeiro.local"}
+{"level":"info","ts":1791431676.9196389,"logger":"tls","msg":"reloading managed certificate","identifiers":["financeiro.local"]}
+{"level":"info","ts":1791431676.9357605,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["financeiro.local"],"new_expiration":1791474877}
+{"level":"info","ts":1791457477.0224292,"logger":"tls","msg":"storage cleaning happened too recently; skipping for now","storage":"FileStorage:C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy","instance":"b54284b6-d6b7-43a3-bd9d-b3a88a8efae2","try_again":1791543877.0224292,"try_again_in":86400}
+{"level":"info","ts":1791457477.023627,"logger":"tls","msg":"finished cleaning storage units"}
+{"level":"info","ts":1791460476.8684347,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["financeiro.local"],"expiration":1791474877,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":14400.1315654}
+{"level":"info","ts":1791460476.9175606,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["financeiro.local"],"remaining":14400.0824395}
+{"level":"info","ts":1791460476.918284,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["financeiro.local"],"remaining":14400.081716}
+{"level":"info","ts":1791460476.933218,"logger":"tls.renew","msg":"acquiring lock","identifier":"financeiro.local"}
+{"level":"info","ts":1791460476.9357743,"logger":"tls.renew","msg":"lock acquired","identifier":"financeiro.local"}
+{"level":"info","ts":1791460476.9371364,"logger":"tls.renew","msg":"renewing certificate","identifier":"financeiro.local","remaining":14400.0628635}
+{"level":"info","ts":1791460476.9548025,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"financeiro.local","issuer":"local"}
+{"level":"info","ts":1791460476.9553733,"logger":"tls.renew","msg":"releasing lock","identifier":"financeiro.local"}
+{"level":"info","ts":1791460476.9561265,"logger":"tls","msg":"reloading managed certificate","identifiers":["financeiro.local"]}
+{"level":"info","ts":1791460476.9635909,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["financeiro.local"],"new_expiration":1791503677}
