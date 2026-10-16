@@ -1,85 +1,31 @@
-{"level":"info","ts":1791980644.7099097,"msg":"maxprocs: Leaving GOMAXPROCS=20: CPU quota undefined"}
-{"level":"info","ts":1791980644.710477,"msg":"GOMEMLIMIT is updated","GOMEMLIMIT":46232834457,"previous":9223372036854775807}
-{"level":"info","ts":1791980644.711622,"msg":"using config from file","file":"C:\\Volume\\proxy\\Caddyfile"}
-{"level":"warn","ts":1791980644.7121801,"msg":"Unnecessary header_up X-Forwarded-Host: the reverse proxy's default behavior is to pass headers to the upstream"}
-{"level":"info","ts":1791980644.7121801,"msg":"adapted config to JSON","adapter":"caddyfile"}
-{"level":"warn","ts":1791980644.7127616,"msg":"Caddyfile input is not formatted; run 'caddy fmt --overwrite' to fix inconsistencies","adapter":"caddyfile","file":"C:\\Volume\\proxy\\Caddyfile","line":2}
-{"level":"info","ts":1791980644.7459426,"logger":"admin","msg":"admin endpoint started","address":"localhost:2019","enforce_origin":false,"origins":["//127.0.0.1:2019","//localhost:2019","//[::1]:2019"]}
-{"level":"info","ts":1791980644.7477102,"logger":"tls.cache.maintenance","msg":"started background certificate maintenance","cache":"0x210d827d8f00"}
-{"level":"info","ts":1791980644.8992634,"logger":"http.auto_https","msg":"skipping automatic certificate management because one or more matching certificates are already loaded","domain":"ponto.local","server_name":"srv0"}
-{"level":"info","ts":1791980644.8998282,"logger":"http.auto_https","msg":"skipping automatic certificate management because one or more matching certificates are already loaded","domain":"ponto.admin","server_name":"srv0"}
-{"level":"info","ts":1791980644.8998282,"logger":"http.auto_https","msg":"skipping automatic certificate management because one or more matching certificates are already loaded","domain":"volume.local","server_name":"srv0"}
-{"level":"info","ts":1791980644.9003956,"logger":"http.auto_https","msg":"automatic HTTP->HTTPS redirects are disabled","server_name":"srv0"}
-{"level":"warn","ts":1791980644.9003956,"logger":"http.auto_https","msg":"server is listening only on the HTTP port, so no automatic HTTPS will be applied to this server","server_name":"srv1","http_port":80}
-{"level":"info","ts":1791980644.9009662,"logger":"http.auto_https","msg":"automatic HTTP->HTTPS redirects are disabled","server_name":"srv3"}
-{"level":"warn","ts":1791980644.906053,"logger":"http","msg":"HTTP/2 skipped because it requires TLS","network":"tcp","addr":":8080"}
-{"level":"warn","ts":1791980644.906053,"logger":"http","msg":"HTTP/3 skipped because it requires TLS","network":"tcp","addr":":8080"}
-{"level":"info","ts":1791980644.9066176,"logger":"http.log","msg":"server running","name":"srv2","protocols":["h1","h2","h3"]}
-{"level":"info","ts":1791980644.9075003,"logger":"http","msg":"enabling HTTP/3 listener","addr":":8443"}
-{"level":"info","ts":1791980644.9123178,"logger":"http.log","msg":"server running","name":"srv3","protocols":["h1","h2","h3"]}
-{"level":"info","ts":1791980644.9128923,"logger":"http","msg":"enabling HTTP/3 listener","addr":":443"}
-{"level":"info","ts":1791980644.9134605,"logger":"http.log","msg":"server running","name":"srv0","protocols":["h1","h2","h3"]}
-{"level":"warn","ts":1791980644.914035,"logger":"http","msg":"HTTP/2 skipped because it requires TLS","network":"tcp","addr":":80"}
-{"level":"warn","ts":1791980644.914605,"logger":"http","msg":"HTTP/3 skipped because it requires TLS","network":"tcp","addr":":80"}
-{"level":"info","ts":1791980644.914605,"logger":"http.log","msg":"server running","name":"srv1","protocols":["h1","h2","h3"]}
-{"level":"info","ts":1791980644.9151974,"logger":"http","msg":"enabling automatic TLS certificate management","domains":["financeiro.local"]}
-{"level":"info","ts":1791980644.9554672,"logger":"tls","msg":"storage cleaning happened too recently; skipping for now","storage":"FileStorage:C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy","instance":"b54284b6-d6b7-43a3-bd9d-b3a88a8efae2","try_again":1792067044.9554672,"try_again_in":86400}
-{"level":"info","ts":1791980644.9565425,"logger":"tls","msg":"finished cleaning storage units"}
-{"level":"info","ts":1791980644.9794955,"logger":"pki.ca.local","msg":"root certificate is already trusted by system","path":"storage:pki/authorities/local/root.crt"}
-{"level":"info","ts":1791980644.9811451,"msg":"autosaved config (load with --resume flag)","file":"C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy\\autosave.json"}
-{"level":"info","ts":1791980644.9817097,"msg":"serving initial configuration"}
-{"level":"error","ts":1791982225.143734,"logger":"http.log.error","msg":"dial tcp 127.0.0.1:8081: connectex: Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente.","request":{"remote_ip":"127.0.0.1","remote_port":"52941","client_ip":"127.0.0.1","proto":"HTTP/2.0","method":"GET","host":"financeiro.local:8443","uri":"/wordpress/wp-admin/admin.php?page=rma-bluestacks","headers":{"Priority":["u=0, i"],"Sec-Ch-Ua-Mobile":["?0"],"Upgrade-Insecure-Requests":["1"],"Accept-Language":["pt-BR,pt;q=0.9"],"Sec-Fetch-Site":["same-origin"],"Sec-Ch-Ua-Platform":["\"Windows\""],"Referer":["https://financeiro.local:8443/wordpress/wp-admin/admin.php?page=rma-control-pro-list"],"Cookie":["REDACTED"],"Sec-Fetch-Dest":["document"],"Accept":["text/html,application/xhtml+xml,application/xml;q=0.9,image/jxl,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"],"Sec-Fetch-Mode":["navigate"],"Sec-Ch-Ua":["\"Google Chrome\";v=\"155\", \"Chromium\";v=\"155\", \"Not(A:Brand\";v=\"24\""],"Sec-Fetch-User":["?1"],"User-Agent":["Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36"],"Accept-Encoding":["gzip, deflate, br, zstd"]},"tls":{"resumed":false,"version":772,"cipher_suite":4865,"proto":"h2","server_name":"financeiro.local","ech":false}},"duration":0.0060934,"status":502,"err_id":"8u05gmyaf","err_trace":"reverseproxy.statusError (reverseproxy.go:1626)"}
-{"level":"warn","ts":1791997748.5579815,"logger":"http.handlers.reverse_proxy","msg":"aborting with incomplete response","upstream":"127.0.0.1:8081","duration":1.1100958,"request":{"remote_ip":"192.168.1.7","remote_port":"56684","client_ip":"192.168.1.7","proto":"HTTP/2.0","method":"GET","host":"financeiro.local:8443","uri":"/wordpress/wp-includes/js/dist/components.min.js?ver=9b751f17060211272a5c","headers":{"X-Forwarded-Proto":["https"],"Sec-Fetch-Mode":["no-cors"],"Accept-Language":["pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7"],"Sec-Ch-Ua-Mobile":["?0"],"X-Forwarded-Host":["financeiro.local"],"Referer":["https://financeiro.local:8443/wordpress/wp-admin/about.php"],"Accept":["*/*"],"X-Forwarded-For":["192.168.1.7"],"Sec-Ch-Ua-Platform":["\"Windows\""],"Sec-Fetch-Site":["same-origin"],"User-Agent":["Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36"],"Priority":["u=2"],"X-Forwarded-Port":["8443"],"Cookie":["REDACTED"],"Sec-Ch-Ua":["\"Google Chrome\";v=\"155\", \"Chromium\";v=\"155\", \"Not(A:Brand\";v=\"24\""],"Via":["2.0 Caddy"],"Accept-Encoding":["gzip, deflate, br, zstd"],"Sec-Fetch-Dest":["script"]},"tls":{"resumed":false,"version":772,"cipher_suite":4865,"proto":"h2","server_name":"financeiro.local","ech":false}},"error":"writing: http2: stream closed"}
-{"level":"warn","ts":1791997749.5409877,"logger":"http.handlers.reverse_proxy","msg":"aborting with incomplete response","upstream":"127.0.0.1:8081","duration":1.4113528,"request":{"remote_ip":"192.168.1.7","remote_port":"56684","client_ip":"192.168.1.7","proto":"HTTP/2.0","method":"GET","host":"financeiro.local:8443","uri":"/wordpress/wp-includes/js/dist/block-editor.min.js?ver=37e58da384b2558bd479","headers":{"Sec-Ch-Ua-Mobile":["?0"],"Cookie":["REDACTED"],"Accept-Language":["pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7"],"Via":["2.0 Caddy"],"Accept":["*/*"],"X-Forwarded-Host":["financeiro.local"],"Accept-Encoding":["gzip, deflate, br, zstd"],"X-Forwarded-Port":["8443"],"Sec-Ch-Ua":["\"Google Chrome\";v=\"155\", \"Chromium\";v=\"155\", \"Not(A:Brand\";v=\"24\""],"X-Forwarded-For":["192.168.1.7"],"Priority":["u=2"],"Sec-Fetch-Mode":["no-cors"],"X-Forwarded-Proto":["https"],"User-Agent":["Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36"],"Referer":["https://financeiro.local:8443/wordpress/wp-admin/about.php"],"Sec-Fetch-Site":["same-origin"],"Sec-Ch-Ua-Platform":["\"Windows\""],"Sec-Fetch-Dest":["script"]},"tls":{"resumed":false,"version":772,"cipher_suite":4865,"proto":"h2","server_name":"financeiro.local","ech":false}},"error":"writing: http2: stream closed"}
-{"level":"info","ts":1792005844.7492793,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["financeiro.local"],"expiration":1792019872,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":14027.2507208}
-{"level":"info","ts":1792005844.814288,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["financeiro.local"],"remaining":14027.1857122}
-{"level":"info","ts":1792005844.814944,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["financeiro.local"],"remaining":14027.1850561}
-{"level":"info","ts":1792005844.84072,"logger":"tls.renew","msg":"acquiring lock","identifier":"financeiro.local"}
-{"level":"info","ts":1792005844.844239,"logger":"tls.renew","msg":"lock acquired","identifier":"financeiro.local"}
-{"level":"info","ts":1792005844.846084,"logger":"tls.renew","msg":"renewing certificate","identifier":"financeiro.local","remaining":14027.1539159}
-{"level":"info","ts":1792005844.861885,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"financeiro.local","issuer":"local"}
-{"level":"info","ts":1792005844.8625288,"logger":"tls.renew","msg":"releasing lock","identifier":"financeiro.local"}
-{"level":"info","ts":1792005844.8631585,"logger":"tls","msg":"reloading managed certificate","identifiers":["financeiro.local"]}
-{"level":"info","ts":1792005844.8815036,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["financeiro.local"],"new_expiration":1792049045}
-{"level":"info","ts":1792034644.7483246,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["financeiro.local"],"expiration":1792049045,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":14400.2516753}
-{"level":"info","ts":1792034644.7538757,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["financeiro.local"],"remaining":14400.2461242}
-{"level":"info","ts":1792034644.7548873,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["financeiro.local"],"remaining":14400.2451125}
-{"level":"info","ts":1792034644.7743654,"logger":"tls.renew","msg":"acquiring lock","identifier":"financeiro.local"}
-{"level":"info","ts":1792034644.7781217,"logger":"tls.renew","msg":"lock acquired","identifier":"financeiro.local"}
-{"level":"info","ts":1792034644.780093,"logger":"tls.renew","msg":"renewing certificate","identifier":"financeiro.local","remaining":14400.2199072}
-{"level":"info","ts":1792034644.796383,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"financeiro.local","issuer":"local"}
-{"level":"info","ts":1792034644.7969468,"logger":"tls.renew","msg":"releasing lock","identifier":"financeiro.local"}
-{"level":"info","ts":1792034644.7980404,"logger":"tls","msg":"reloading managed certificate","identifiers":["financeiro.local"]}
-{"level":"info","ts":1792034644.816054,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["financeiro.local"],"new_expiration":1792077845}
-{"level":"info","ts":1792063506.950076,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["financeiro.local"],"expiration":1792077845,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":14338.0499239}
-{"level":"info","ts":1792063506.9896557,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["financeiro.local"],"remaining":14338.0103443}
-{"level":"info","ts":1792063506.9903452,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["financeiro.local"],"remaining":14338.0096548}
-{"level":"info","ts":1792063507.0029757,"logger":"tls.renew","msg":"acquiring lock","identifier":"financeiro.local"}
-{"level":"info","ts":1792063507.0052464,"logger":"tls.renew","msg":"lock acquired","identifier":"financeiro.local"}
-{"level":"info","ts":1792063507.0066009,"logger":"tls.renew","msg":"renewing certificate","identifier":"financeiro.local","remaining":14337.993399}
-{"level":"info","ts":1792063507.02027,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"financeiro.local","issuer":"local"}
-{"level":"info","ts":1792063507.020812,"logger":"tls.renew","msg":"releasing lock","identifier":"financeiro.local"}
-{"level":"info","ts":1792063507.0214016,"logger":"tls","msg":"reloading managed certificate","identifiers":["financeiro.local"]}
-{"level":"info","ts":1792063507.028924,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["financeiro.local"],"new_expiration":1792106708}
-{"level":"info","ts":1792067107.1912093,"logger":"tls","msg":"cleaning storage unit","storage":"FileStorage:C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy"}
-{"level":"info","ts":1792067107.1988988,"logger":"tls","msg":"finished cleaning storage units"}
-{"level":"info","ts":1792092906.9498265,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["financeiro.local"],"expiration":1792106708,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":13801.0501735}
-{"level":"info","ts":1792092906.9966269,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["financeiro.local"],"remaining":13801.003373}
-{"level":"info","ts":1792092906.997291,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["financeiro.local"],"remaining":13801.0027091}
-{"level":"info","ts":1792092907.0126152,"logger":"tls.renew","msg":"acquiring lock","identifier":"financeiro.local"}
-{"level":"info","ts":1792092907.0151842,"logger":"tls.renew","msg":"lock acquired","identifier":"financeiro.local"}
-{"level":"info","ts":1792092907.0174968,"logger":"tls.renew","msg":"renewing certificate","identifier":"financeiro.local","remaining":13800.9825031}
-{"level":"info","ts":1792092907.0307615,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"financeiro.local","issuer":"local"}
-{"level":"info","ts":1792092907.0313213,"logger":"tls.renew","msg":"releasing lock","identifier":"financeiro.local"}
-{"level":"info","ts":1792092907.031892,"logger":"tls","msg":"reloading managed certificate","identifiers":["financeiro.local"]}
-{"level":"info","ts":1792092907.0521114,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["financeiro.local"],"new_expiration":1792136108}
-{"level":"info","ts":1792122306.9499712,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["financeiro.local"],"expiration":1792136108,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":13801.0500287}
-{"level":"info","ts":1792122306.9549139,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["financeiro.local"],"remaining":13801.0450862}
-{"level":"info","ts":1792122306.9555678,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["financeiro.local"],"remaining":13801.0444322}
-{"level":"info","ts":1792122306.9762359,"logger":"tls.renew","msg":"acquiring lock","identifier":"financeiro.local"}
-{"level":"info","ts":1792122306.9798698,"logger":"tls.renew","msg":"lock acquired","identifier":"financeiro.local"}
-{"level":"info","ts":1792122306.981744,"logger":"tls.renew","msg":"renewing certificate","identifier":"financeiro.local","remaining":13801.0182559}
-{"level":"info","ts":1792122306.9986057,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"financeiro.local","issuer":"local"}
-{"level":"info","ts":1792122306.9993637,"logger":"tls.renew","msg":"releasing lock","identifier":"financeiro.local"}
-{"level":"info","ts":1792122306.9998765,"logger":"tls","msg":"reloading managed certificate","identifiers":["financeiro.local"]}
-{"level":"info","ts":1792122307.01087,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["financeiro.local"],"new_expiration":1792165507}
+{"level":"info","ts":1792167253.136235,"msg":"maxprocs: Leaving GOMAXPROCS=20: CPU quota undefined"}
+{"level":"info","ts":1792167253.1373487,"msg":"GOMEMLIMIT is updated","GOMEMLIMIT":46232834457,"previous":9223372036854775807}
+{"level":"info","ts":1792167253.1379228,"msg":"using config from file","file":"C:\\Volume\\proxy\\Caddyfile"}
+{"level":"warn","ts":1792167253.1379228,"msg":"Unnecessary header_up X-Forwarded-Host: the reverse proxy's default behavior is to pass headers to the upstream"}
+{"level":"info","ts":1792167253.1385014,"msg":"adapted config to JSON","adapter":"caddyfile"}
+{"level":"warn","ts":1792167253.1385014,"msg":"Caddyfile input is not formatted; run 'caddy fmt --overwrite' to fix inconsistencies","adapter":"caddyfile","file":"C:\\Volume\\proxy\\Caddyfile","line":2}
+{"level":"info","ts":1792167253.1712933,"logger":"admin","msg":"admin endpoint started","address":"localhost:2019","enforce_origin":false,"origins":["//localhost:2019","//[::1]:2019","//127.0.0.1:2019"]}
+{"level":"info","ts":1792167253.173557,"logger":"tls.cache.maintenance","msg":"started background certificate maintenance","cache":"0x27a7a613da80"}
+{"level":"info","ts":1792167253.304107,"logger":"http.auto_https","msg":"skipping automatic certificate management because one or more matching certificates are already loaded","domain":"volume.local","server_name":"srv0"}
+{"level":"info","ts":1792167253.3633244,"logger":"http.auto_https","msg":"skipping automatic certificate management because one or more matching certificates are already loaded","domain":"ponto.local","server_name":"srv0"}
+{"level":"info","ts":1792167253.3638644,"logger":"http.auto_https","msg":"skipping automatic certificate management because one or more matching certificates are already loaded","domain":"ponto.admin","server_name":"srv0"}
+{"level":"info","ts":1792167253.366147,"logger":"http.auto_https","msg":"automatic HTTP->HTTPS redirects are disabled","server_name":"srv0"}
+{"level":"warn","ts":1792167253.3667138,"logger":"http.auto_https","msg":"server is listening only on the HTTP port, so no automatic HTTPS will be applied to this server","server_name":"srv1","http_port":80}
+{"level":"info","ts":1792167253.3689463,"logger":"http.auto_https","msg":"automatic HTTP->HTTPS redirects are disabled","server_name":"srv3"}
+{"level":"warn","ts":1792167253.4551191,"logger":"http","msg":"HTTP/2 skipped because it requires TLS","network":"tcp","addr":":80"}
+{"level":"warn","ts":1792167253.4556928,"logger":"http","msg":"HTTP/3 skipped because it requires TLS","network":"tcp","addr":":80"}
+{"level":"info","ts":1792167253.4556928,"logger":"http.log","msg":"server running","name":"srv1","protocols":["h1","h2","h3"]}
+{"level":"warn","ts":1792167253.456828,"logger":"http","msg":"HTTP/2 skipped because it requires TLS","network":"tcp","addr":":8080"}
+{"level":"warn","ts":1792167253.456828,"logger":"http","msg":"HTTP/3 skipped because it requires TLS","network":"tcp","addr":":8080"}
+{"level":"info","ts":1792167253.4573956,"logger":"http.log","msg":"server running","name":"srv2","protocols":["h1","h2","h3"]}
+{"level":"info","ts":1792167253.4579625,"logger":"http","msg":"enabling HTTP/3 listener","addr":":8443"}
+{"level":"info","ts":1792167253.461905,"logger":"http.log","msg":"server running","name":"srv3","protocols":["h1","h2","h3"]}
+{"level":"info","ts":1792167253.4624832,"logger":"http","msg":"enabling HTTP/3 listener","addr":":443"}
+{"level":"info","ts":1792167253.4636211,"logger":"http.log","msg":"server running","name":"srv0","protocols":["h1","h2","h3"]}
+{"level":"info","ts":1792167253.4636211,"logger":"http","msg":"enabling automatic TLS certificate management","domains":["financeiro.local"]}
+{"level":"info","ts":1792167253.4986084,"logger":"tls","msg":"cleaning storage unit","storage":"FileStorage:C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy"}
+{"level":"info","ts":1792167253.5072787,"logger":"tls","msg":"finished cleaning storage units"}
+{"level":"info","ts":1792167253.5284917,"logger":"pki.ca.local","msg":"root certificate is already trusted by system","path":"storage:pki/authorities/local/root.crt"}
+{"level":"info","ts":1792167253.5726254,"msg":"autosaved config (load with --resume flag)","file":"C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy\\autosave.json"}
+{"level":"info","ts":1792167253.5741355,"msg":"serving initial configuration"}
+{"level":"error","ts":1792167712.0688958,"logger":"http.log.error","msg":"dial tcp 127.0.0.1:8081: connectex: Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente.","request":{"remote_ip":"127.0.0.1","remote_port":"62000","client_ip":"127.0.0.1","proto":"HTTP/2.0","method":"GET","host":"financeiro.local:8443","uri":"/wordpress/wp-admin/admin.php?page=rma-superfrete","headers":{"Sec-Ch-Ua-Mobile":["?0"],"Upgrade-Insecure-Requests":["1"],"Sec-Fetch-Mode":["navigate"],"Accept-Language":["pt-BR,pt;q=0.9"],"Accept":["text/html,application/xhtml+xml,application/xml;q=0.9,image/jxl,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"],"Sec-Fetch-Dest":["document"],"Sec-Fetch-User":["?1"],"User-Agent":["Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36"],"Sec-Ch-Ua":["\"Google Chrome\";v=\"155\", \"Chromium\";v=\"155\", \"Not(A:Brand\";v=\"24\""],"Sec-Ch-Ua-Platform":["\"Windows\""],"Cookie":["REDACTED"],"Priority":["u=0, i"],"Sec-Fetch-Site":["same-origin"],"Referer":["https://financeiro.local:8443/wordpress/wp-admin/admin.php?page=rma-superfrete"],"Accept-Encoding":["gzip, deflate, br, zstd"]},"tls":{"resumed":false,"version":772,"cipher_suite":4865,"proto":"h2","server_name":"financeiro.local","ech":false}},"duration":0.0090514,"status":502,"err_id":"dnvjuyh4y","err_trace":"reverseproxy.statusError (reverseproxy.go:1626)"}
