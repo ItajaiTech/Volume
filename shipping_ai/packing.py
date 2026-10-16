@@ -316,12 +316,31 @@ def _item_bundle_spec(item_row, packing_rules=None):
     if qty < min_qty:
         return None
 
-    return {
-        "label": label,
-        "bundle_qty": bundle_qty,
-        "dims": _ram_bundle_dimensions_cm(item_row, bundle_qty),
-        "profile": profile,
-    }
+    dims = _ram_bundle_dimensions_cm(item_row, bundle_qty)
+    for index, dimension in enumerate(("length", "width", "height")):
+        measured = float(_rule_value(packing_rules, f"{profile}_bundle_{dimension}_cm", 0))
+        if measured > 0:
+            dims[index] = measured
+    spec = {"label": label, "bundle_qty": bundle_qty, "dims": dims, "profile": profile}
+    if int(_rule_value(packing_rules, "ram_overlap_enabled", 0)):
+        tab = float(_rule_value(packing_rules, "ram_blister_tab_cm", 1.2))
+        clearance = float(_rule_value(packing_rules, "ram_pair_clearance_cm", 0.2))
+        pair_length = 2 * (dims[0] - tab) + clearance
+        # Invalid geometry must not shrink the pair below an individual pack.
+        if 0 <= tab < dims[0] and dims[0] <= pair_length <= 2 * dims[0]:
+            spec["pair_dims"] = [pair_length, dims[1], dims[2]]
+    return spec
+
+
+def _packed_groups(spec, packs):
+    """Keep an unpaired pack at its full length; never shrink individual blisters."""
+    groups = []
+    if spec.get("pair_dims") and packs >= 2:
+        groups.append((spec["pair_dims"], packs // 2))
+        packs %= 2
+    if packs:
+        groups.append((spec["dims"], packs))
+    return groups
 
 
 def _ram_profile_threshold(profile, packing_rules=None):
@@ -498,10 +517,10 @@ def _effective_volume_for_item(item_row, packing_rules=None):
             bundle_spec,
             packing_rules=packing_rules,
         )
-        bundle_dims = bundle_spec["dims"]
-        bundle_volume = bundle_dims[0] * bundle_dims[1] * bundle_dims[2]
+        packed_volume = sum(math.prod(dims) * count for dims, count in
+                            _packed_groups(bundle_spec, breakdown["full_packs"]))
         raw_volume = product_volume_cm3(item_row)
-        return (breakdown["full_packs"] * bundle_volume) + (breakdown["loose_units"] * raw_volume)
+        return packed_volume + (breakdown["loose_units"] * raw_volume)
 
     return product_volume_cm3(item_row) * qty
 
@@ -613,12 +632,12 @@ def estimate_packages_for_box(
     total_volume_cm3,
     total_weight,
     box_row,
-    fill_factor=0.9,
+    fill_factor=None,
     order_items=None,
     packing_rules=None,
 ):
     raw_volume = box_volume_cm3(box_row)
-    usable_volume = raw_volume * float(fill_factor)
+    usable_volume = raw_volume * float(fill_factor if fill_factor is not None else _rule_value(packing_rules, "fill_factor", 0.9))
     max_weight = float(box_row["max_weight"])
 
     if usable_volume <= 0 or max_weight <= 0:
@@ -1055,16 +1074,9 @@ def _build_preview_groups_for_item(item, packing_rules=None, unpack_packs=0):
     bundle_dims = bundle_spec["dims"]
     raw_dims = _raw_item_dimensions_cm(item)
 
-    if packed_packs > 0:
-        groups.append(
-            {
-                "label": label,
-                "dims": [float(bundle_dims[0]), float(bundle_dims[1]), float(bundle_dims[2])],
-                "blocks": int(packed_packs),
-                "raw_quantity": raw_qty,
-                "color": color,
-            }
-        )
+    for dims, count in _packed_groups(bundle_spec, packed_packs):
+        groups.append({"label": label, "dims": list(dims), "blocks": count,
+                       "raw_quantity": raw_qty, "color": color})
 
     if loose_units > 0:
         groups.append(
@@ -1093,6 +1105,8 @@ def _build_preview_groups_for_item(item, packing_rules=None, unpack_packs=0):
             f"=> {packed_packs} pack(s) de {bundle_spec['bundle_qty']}."
         )
 
+    if bundle_spec.get("pair_dims") and packed_packs >= 2:
+        note += f" {packed_packs // 2} par(es) com abas sobrepostas: {bundle_spec['pair_dims']} cm."
     return groups, [note]
 
 
@@ -1490,6 +1504,8 @@ def _select_preferred_preview_scenario(base_scenario, unpack_scenario):
 
     base_fit = base_scenario["simulation"]["placed_blocks"] >= base_scenario["total_blocks"]
     unpack_fit = unpack_scenario["simulation"]["placed_blocks"] >= unpack_scenario["total_blocks"]
+    if base_fit:
+        return base_scenario
     if unpack_fit and not base_fit:
         return unpack_scenario
 

@@ -12,6 +12,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.utils import secure_filename
 
 from database import (
+    EXTRA_PACKING_FIELDS,
     add_box,
     add_product,
     add_shipment_history,
@@ -855,7 +856,7 @@ def _apply_mb_default_rule(algo, totals, order_items, mb_context, packing_rules)
         return algo, False
 
     mb_box = mb_context["box"]
-    mb_fill_factor = 1.0 if _is_mb_only_order(order_items) else 0.9
+    mb_fill_factor = float(packing_rules.get("mb_fill_factor", 1.0) if _is_mb_only_order(order_items) else packing_rules.get("fill_factor", 0.9))
     mb_estimate = estimate_packages_for_box(
         totals["total_volume_cm3"],
         totals["total_weight"],
@@ -1297,7 +1298,7 @@ def admin_logout():
 def admin_dashboard():
     stats = get_dashboard_stats(DB_PATH)
     packing_rules = get_packing_rules(DB_PATH)
-    return render_template("dashboard.html", stats=stats, packing_rules=packing_rules)
+    return render_template("dashboard.html", stats=stats, packing_rules=packing_rules, extra_packing_fields=EXTRA_PACKING_FIELDS)
 
 
 @app.route("/admin/settings/packing", methods=["POST"])
@@ -1321,6 +1322,18 @@ def admin_packing_settings():
         "min_effective_max_weight_kg": request.form.get("min_effective_max_weight_kg", "1"),
     }
 
+    current_rules = get_packing_rules(DB_PATH)
+    for key, (_, default, minimum, maximum, step) in EXTRA_PACKING_FIELDS.items():
+        value = request.form.get(key, current_rules.get(key, default))
+        if minimum is not None:
+            try:
+                value = float(str(value).replace(",", "."))
+                if not minimum <= value <= maximum or (step == 1 and not value.is_integer()):
+                    raise ValueError()
+            except (ValueError, TypeError):
+                flash(f"Valor invalido: {EXTRA_PACKING_FIELDS[key][0]}", "error")
+                return redirect(url_for("admin_dashboard"))
+        rules_input[key] = value
     update_packing_rules(DB_PATH, rules_input)
     flash("Regras de empacotamento atualizadas com sucesso.", "success")
     return redirect(url_for("admin_dashboard"))
@@ -2111,6 +2124,48 @@ def order_volumetry(order_id):
     )
 
 
+def _volumetry_error_message(reason):
+    return {
+        "physical_or_pack_capacity_exceeded": "A quantidade excede a capacidade calculada para esta caixa, considerando o encaixe dos produtos e packs, o volume util e o peso. Divida os itens entre mais caixas ou escolha uma caixa maior.",
+        "physical_or_pack_incompatible": "As dimensoes do produto ou pack nao cabem nesta caixa.",
+        "incomplete_assignments": "Distribua todos os itens do pedido, sem faltar nem exceder quantidades.",
+        "empty_package": "Adicione itens ou remova a embalagem vazia.",
+        "box_missing_or_inactive": "Selecione uma embalagem ativa.",
+    }.get(reason, "Distribuicao invalida. Confira as embalagens e as quantidades informadas.")
+
+
+@app.route("/order/<int:order_id>/volumetry/validate", methods=["POST"])
+@admin_required
+def order_volumetry_validate(order_id):
+    if not get_order(DB_PATH, order_id):
+        return {"message": ORDER_NOT_FOUND_MSG}, 404
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, list) or any(not isinstance(row, dict) for row in payload):
+        return {"message": "Formato de distribuicao invalido."}, 400
+    plan = [dict(box_id=row.get("box_id"), quantity=1,
+                 assignments=row.get("assignments", {})) for row in payload]
+    items = get_order_items(DB_PATH, order_id)
+    boxes = list_boxes(DB_PATH)
+    rules = get_packing_rules(DB_PATH)
+    reason = validate_history_plan(plan, items, boxes, rules)
+    results = []
+    for row in plan:
+        package_reason = validate_history_plan([row], items, boxes, rules)
+        # A single package need not contain the entire order.
+        if package_reason == "incomplete_assignments":
+            package_reason = None
+        result = {"valid": package_reason is None,
+                  "message": _volumetry_error_message(package_reason) if package_reason else "Compativel com o calculo de encaixe dos produtos e packs."}
+        if package_reason in (None, "physical_or_pack_capacity_exceeded", "physical_or_pack_incompatible"):
+            assigned = row["assignments"]
+            contents = [dict(item, quantity=assigned.get(str(item["product_id"]), 0)) for item in items]
+            totals = calculate_order_totals(contents, packing_rules=rules)
+            result["volume_cm3"] = totals["total_volume_cm3"]
+        results.append(result)
+    return {"valid": reason is None, "packages": results,
+            "message": _volumetry_error_message(reason) if reason else ""}
+
+
 @app.route("/order/<int:order_id>/volumetry/save", methods=["POST"])
 @admin_required
 def order_volumetry_save(order_id):
@@ -2172,7 +2227,7 @@ def order_volumetry_save(order_id):
         shipments, get_order_items(DB_PATH, order_id), list_boxes(DB_PATH), get_packing_rules(DB_PATH)
     )
     if reason:
-        flash(f"Distribuicao nao pode ser salva: {reason}.", "error")
+        flash(f"Distribuicao nao pode ser salva: {_volumetry_error_message(reason)}", "error")
         return redirect(url_for("order_volumetry", order_id=order_id))
 
     replace_shipment_history(DB_PATH, order_id, shipments)

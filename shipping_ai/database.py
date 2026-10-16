@@ -25,6 +25,27 @@ DEFAULT_PACKING_RULES = {
 }
 
 
+# key: (label, default, minimum, maximum, step). Text fields use None limits.
+EXTRA_PACKING_FIELDS = {
+    "ram_desk_bundle_length_cm": ("RAM DESK - Comprimento individual do pack (cm; 0 = cadastro)", 0.0, 0, 1000, 0.1),
+    "ram_desk_bundle_width_cm": ("RAM DESK - Largura do pack (cm; 0 = cadastro)", 0.0, 0, 1000, 0.1),
+    "ram_desk_bundle_height_cm": ("RAM DESK - Altura medida do pack (cm; 0 = empilhamento automatico)", 0.0, 0, 1000, 0.1),
+    "ram_overlap_enabled": ("RAM DESK e NB - Sobrepor dois packs (0 = nao; 1 = sim)", 0, 0, 1, 1),
+    "ram_blister_tab_cm": ("RAM DESK e NB - Aba descontada por blister (cm)", 1.2, 0, 100, 0.1),
+    "ram_pair_clearance_cm": ("RAM DESK e NB - Folga total no encontro do par (cm)", 0.2, 0, 100, 0.1),
+    "ram_nb_bundle_length_cm": ("RAM NB - Comprimento do pack (cm; 0 = cadastro)", 0.0, 0, 1000, 0.1),
+    "ram_nb_bundle_width_cm": ("RAM NB - Largura do pack (cm; 0 = cadastro)", 0.0, 0, 1000, 0.1),
+    "ram_nb_bundle_height_cm": ("RAM NB - Altura do pack (cm; 0 = empilhamento automatico)", 0.0, 0, 1000, 0.1),
+    "mb_bundle_qty": ("Placa-mae - Unidades por pack", 20, 1, 10000, 1),
+    "mb_bundle_min_qty": ("Placa-mae - Quantidade minima para usar pack/caixa padrao", 21, 1, 10000, 1),
+    "mb_default_box_name": ("Placa-mae - Nome da caixa padrao (medidas no cadastro de caixas)", "Caixa MB", None, None, None),
+    "mb_fill_factor": ("Fracao utilizavel para pedidos somente de placa-mae", 1.0, 0.01, 1, 0.01),
+    "fill_factor": ("Fracao utilizavel do volume da caixa (0,90 = 90%)", 0.9, 0.01, 1, 0.01),
+    "unpack_packs_single_volume": ("Maximo de packs a desmontar para tentar uma caixa (0 = desativar)", 1, 0, 100, 1),
+}
+DEFAULT_PACKING_RULES.update({key: spec[1] for key, spec in EXTRA_PACKING_FIELDS.items()})
+
+
 def get_connection(db_path):
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
@@ -842,36 +863,24 @@ def _normalize_packing_rules(rules):
     normalized["ssdm2_default_box_name"] = " ".join(
         str(rules.get("ssdm2_default_box_name") or DEFAULT_SSDM2_MASTER_BOX_NAME).split()
     ) or DEFAULT_SSDM2_MASTER_BOX_NAME
+    for key, (_, default, minimum, maximum, step) in EXTRA_PACKING_FIELDS.items():
+        value = rules.get(key, default)
+        if minimum is None:
+            normalized[key] = str(value).strip()
+        else:
+            value = _safe_float(value, default)
+            normalized[key] = max(minimum, min(maximum, value))
+            if step == 1:
+                normalized[key] = int(normalized[key])
     return normalized
 
 
 def get_packing_rules(db_path):
     rules = dict(DEFAULT_PACKING_RULES)
     with closing(get_connection(db_path)) as conn:
+        keys = list(DEFAULT_PACKING_RULES) + ['ram_bundle_qty', 'ram_bundle_min_qty']
         rows = conn.execute(
-            """
-            SELECT key, value
-            FROM app_settings
-            WHERE key IN (
-                'ssd25_bundle_qty',
-                'ssd25_bundle_length_cm',
-                'ssd25_bundle_width_cm',
-                'ssd25_bundle_height_cm',
-                'ssdm2_bundle_qty',
-                'ssdm2_bundle_length_cm',
-                'ssdm2_bundle_width_cm',
-                'ssdm2_bundle_height_cm',
-                'ssdm2_master_box_qty',
-                'ssdm2_default_box_name',
-                'ram_nb_bundle_qty',
-                'ram_nb_bundle_min_qty',
-                'ram_desk_bundle_qty',
-                'ram_desk_bundle_min_qty',
-                'ram_bundle_qty',
-                'ram_bundle_min_qty',
-                'min_effective_max_weight_kg'
-            )
-            """
+            "SELECT key, value FROM app_settings WHERE key IN (" + ",".join("?" for _ in keys) + ")", keys
         ).fetchall()
 
     for row in rows:

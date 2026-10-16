@@ -224,7 +224,7 @@ def physical_profile(item, packing_rules=None):
     row['quantity'] = 1000000  # Identify quantity-dependent families consistently.
     spec = _item_bundle_spec(row, packing_rules) or {}
     family = spec.get('profile') or ('mb' if _is_mb_item(row) else _ram_profile(row)) or 'none'
-    return dims, weight, family, spec.get('bundle_qty', 1), tuple(spec.get('dims', ()))
+    return dims, weight, family, spec.get('bundle_qty', 1), tuple(spec.get('dims', ())), tuple(spec.get('pair_dims', ()))
 
 
 def physical_signature(items, rules=None):
@@ -401,6 +401,9 @@ def validate_history_plan(plan, target_items, boxes, rules=None):
         estimate = estimate_packages_for_box(totals['total_volume_cm3'], totals['total_weight'], box,
                                              order_items=contents, packing_rules=rules)
         capacity = int(row['quantity']) if has_assignments else sum(int(r['quantity']) for r in plan)
+        max_capacity_weight = dict(box).get('max_capacity_weight')
+        if max_capacity_weight is not None and totals['total_weight'] > float(max_capacity_weight) * capacity:
+            return 'physical_or_pack_capacity_exceeded'
         if not estimate or estimate['packages_required'] > capacity:
             return 'physical_or_pack_capacity_exceeded'
     if has_assignments and tuple(sorted(assigned_totals.items())) != build_signature(target_items):

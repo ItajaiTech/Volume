@@ -256,6 +256,54 @@ const BOXES = {{ boxes_json | safe }};
 // ─── State ───────────────────────────────────────────────────────────────────
 let packages = [];
 let pkgIdCounter = 0;
+let validationTimer;
+let validationVersion = 0;
+const validationUrl = {{ url_for('order_volumetry_validate', order_id=order['id']) | tojson }};
+
+function currentPayload() {
+    return packages.map(pkg => ({box_id: pkg.boxId, assignments: {...pkg.assignments}}));
+}
+
+async function validateDistribution() {
+    const version = ++validationVersion;
+    const snapshot = JSON.stringify(currentPayload());
+    const response = await fetch(validationUrl, {
+        method: 'POST', headers: {'Content-Type': 'application/json'}, body: snapshot
+    });
+    if (!response.ok || response.redirected) throw new Error('validation_unavailable');
+    const result = await response.json();
+    if (version !== validationVersion || snapshot !== JSON.stringify(currentPayload())) return null;
+    result.packages.forEach((check, index) => {
+        const pkg = packages[index];
+        if (!pkg.boxData || !Object.values(pkg.assignments).some(qty => qty > 0)) return;
+        const status = document.getElementById(`fit-status-${pkg.id}`);
+        const card = document.getElementById(`pkg-${pkg.id}`);
+        if (check.volume_cm3 != null) {
+            const volume = check.volume_cm3;
+            document.getElementById(`vol-label-${pkg.id}`).textContent = `${volume.toFixed(2)} / ${pkg.boxData.vol.toFixed(2)} cm3 (com packs)`;
+            setUtilBar('vol-bar-' + pkg.id, 100 * volume / pkg.boxData.vol);
+        }
+        status.textContent = check.message;
+        status.style.color = check.valid ? '#16a34a' : '#dc2626';
+        card.className = check.valid ? 'pkg-card status-ok' : 'pkg-card status-over';
+    });
+    return result;
+}
+
+function scheduleValidation() {
+    ++validationVersion;
+    clearTimeout(validationTimer);
+    validationTimer = setTimeout(() => validateDistribution().catch(() => {
+        packages.forEach(pkg => {
+            const status = document.getElementById(`fit-status-${pkg.id}`);
+            if (status && pkg.boxData) {
+                status.textContent = 'Nao foi possivel validar o encaixe. Tente novamente ao salvar.';
+                status.style.color = '#b45309';
+                document.getElementById(`pkg-${pkg.id}`).className = 'pkg-card status-empty';
+            }
+        });
+    }), 300);
+}
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
@@ -300,6 +348,7 @@ function addPackage(presetBoxId, presetAssignments) {
 
 function removePackage(id) {
     packages = packages.filter(p => p.id !== id);
+    scheduleValidation();
     const el = document.getElementById('pkg-' + id);
     if (el) el.remove();
 
@@ -544,11 +593,12 @@ function recalcPackage(pkgId) {
             statusEl.style.color = '#9ca3af';
             card.className = 'pkg-card status-empty';
         } else {
-            statusEl.textContent = `✓ Cabe na embalagem (${volPct.toFixed(1)}% vol., ${wgtPct.toFixed(1)}% peso)`;
+            statusEl.textContent = 'Validando encaixe dos produtos e packs...';
             statusEl.style.color = '#16a34a';
-            card.className = 'pkg-card status-ok';
+            card.className = 'pkg-card status-empty';
         }
     }
+    scheduleValidation();
 }
 
 function setUtilBar(barId, pct) {
@@ -605,7 +655,7 @@ function updateRemaining() {
 }
 
 // ─── Submit ────────────────────────────────────────────────────────────────────
-function submitVolumetry() {
+async function submitVolumetry() {
     const errEl = document.getElementById('vol-error-msg');
     errEl.style.display = 'none';
 
@@ -631,22 +681,20 @@ function submitVolumetry() {
         return;
     }
 
-    // Verify no package exceeds box capacity
-    const overloaded = packages.filter(pkg => {
-        if (!pkg.boxData) return false;
-        let totalVol = 0, totalWeight = 0;
-        ITEMS.forEach(item => {
-            const qty = pkg.assignments[item.product_id] || 0;
-            totalVol += qty * item.vol_unit;
-            totalWeight += qty * item.weight;
-        });
-        return totalVol > pkg.boxData.vol * 1.001 || totalWeight > pkg.boxData.max_weight * 1.001;
-    });
-
-    if (overloaded.length > 0) {
-        if (!confirm('Atenção: ' + overloaded.length + ' embalagem(ns) excedem a capacidade. Deseja salvar mesmo assim?')) {
+    clearTimeout(validationTimer);
+    try {
+        const result = await validateDistribution();
+        if (!result) {
+            showError('A distribuicao mudou durante a validacao. Confira os itens e salve novamente.');
             return;
         }
+        if (!result.valid) {
+            showError(result.message);
+            return;
+        }
+    } catch (error) {
+        showError('Nao foi possivel validar a distribuicao. Tente novamente. Seus itens continuam nesta tela.');
+        return;
     }
 
     // Build payload
@@ -662,7 +710,7 @@ function submitVolumetry() {
 function showError(msg) {
     const errEl = document.getElementById('vol-error-msg');
     errEl.textContent = msg;
-    errEl.style.display = '';
+    errEl.style.display = 'block';
     errEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 </script>
