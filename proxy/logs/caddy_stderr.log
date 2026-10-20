@@ -28,3 +28,13 @@
 {"level":"info","ts":1792517155.4385343,"msg":"serving initial configuration"}
 {"level":"info","ts":1792517155.4717271,"logger":"tls","msg":"storage cleaning happened too recently; skipping for now","storage":"FileStorage:C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy","instance":"b54284b6-d6b7-43a3-bd9d-b3a88a8efae2","try_again":1792603555.4717271,"try_again_in":86400}
 {"level":"info","ts":1792517155.4722345,"logger":"tls","msg":"finished cleaning storage units"}
+{"level":"info","ts":1792524355.2669823,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["financeiro.local"],"expiration":1792538586,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":14230.7330177}
+{"level":"info","ts":1792524355.2703848,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["financeiro.local"],"remaining":14230.7296151}
+{"level":"info","ts":1792524355.271054,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["financeiro.local"],"remaining":14230.7289459}
+{"level":"info","ts":1792524355.2965865,"logger":"tls.renew","msg":"acquiring lock","identifier":"financeiro.local"}
+{"level":"info","ts":1792524355.2999792,"logger":"tls.renew","msg":"lock acquired","identifier":"financeiro.local"}
+{"level":"info","ts":1792524355.3019881,"logger":"tls.renew","msg":"renewing certificate","identifier":"financeiro.local","remaining":14230.6980119}
+{"level":"info","ts":1792524355.3207014,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"financeiro.local","issuer":"local"}
+{"level":"info","ts":1792524355.321226,"logger":"tls.renew","msg":"releasing lock","identifier":"financeiro.local"}
+{"level":"info","ts":1792524355.3223224,"logger":"tls","msg":"reloading managed certificate","identifiers":["financeiro.local"]}
+{"level":"info","ts":1792524355.338814,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["financeiro.local"],"new_expiration":1792567556}
