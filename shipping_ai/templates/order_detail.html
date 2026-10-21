@@ -143,7 +143,33 @@
 
     <h3>{% if shipments %}Resumo do Pedido{% else %}Recomendacao{% endif %}</h3>
     <div class="recommend-box">
-        <p><strong>Volume Total:</strong> {{ '%.2f'|format(recommendation.totals.total_volume_cm3) }} cm3</p>
+        <p><strong>Quantidade total de itens:</strong> {{ recommendation.totals.total_units }} und</p>
+        <p><strong>Volume total dos produtos:</strong> {{ ('%.2f'|format(recommendation.totals.total_volume_cm3))|replace('.', ',') }} cm³ / {{ ('%.8f'|format(recommendation.totals.total_volume_cm3 / 1000000))|replace('.', ',') }} m³</p>
+        {% set shipping_summary = namespace(plan=[], packages=0, volume_cm3=0) %}
+        {% if shipments %}
+            {% for sh in shipments %}
+                {% set shipping_summary.plan = shipping_summary.plan + [{'box': sh, 'name': sh['box_name'], 'quantity': sh['quantity']}] %}
+            {% endfor %}
+        {% elif recommendation.history_plan %}
+            {% for entry in recommendation.history_plan %}
+                {% set shipping_summary.plan = shipping_summary.plan + [{'box': entry.box, 'name': entry.box.name, 'quantity': entry.quantity}] %}
+            {% endfor %}
+        {% elif recommendation.box %}
+            {% set shipping_summary.plan = [{'box': recommendation.box, 'name': recommendation.box['name'], 'quantity': recommendation.packages_required}] %}
+        {% endif %}
+        {% for entry in shipping_summary.plan %}
+            {% set box_volume = entry.box['length_cm'] * entry.box['width_cm'] * entry.box['height_cm'] %}
+            {% set shipping_summary.packages = shipping_summary.packages + entry.quantity %}
+            {% set shipping_summary.volume_cm3 = shipping_summary.volume_cm3 + box_volume * entry.quantity %}
+            <p><strong>{% if shipments %}Caixa do plano manual{% else %}Caixa indicada{% endif %}:</strong> {{ entry.name }} — {{ entry.quantity }} volume(s)<br>
+                <strong>Dimensões (C × L × A):</strong> {{ '%g'|format(entry.box['length_cm']) }} × {{ '%g'|format(entry.box['width_cm']) }} × {{ '%g'|format(entry.box['height_cm']) }} cm<br>
+                <strong>Volume por caixa:</strong> {{ ('%.2f'|format(box_volume))|replace('.', ',') }} cm³ / {{ ('%.8f'|format(box_volume / 1000000))|replace('.', ',') }} m³
+            </p>
+        {% endfor %}
+        {% if shipping_summary.plan %}
+            <p><strong>Quantidade de Volumes:</strong> {{ shipping_summary.packages }}</p>
+            <p><strong>Volume total das caixas:</strong> {{ ('%.2f'|format(shipping_summary.volume_cm3))|replace('.', ',') }} cm³ / {{ ('%.8f'|format(shipping_summary.volume_cm3 / 1000000))|replace('.', ',') }} m³</p>
+        {% endif %}
         <p><strong>Peso Total (pecas + embalagens):</strong> {{ '%.2f'|format(recommendation.totals.total_weight_with_packages) }} kg</p>
         <p class="hint">
             Pecas: {{ '%.2f'|format(recommendation.totals.total_weight_items) }} kg |
@@ -207,8 +233,6 @@
             {% endif %}
         {% elif recommendation.box %}
 
-            <p><strong>Embalagem Sugerida:</strong> {{ recommendation.box['name'] }}</p>
-            <p><strong>Quantidade de Volumes:</strong> {{ recommendation.packages_required }}</p>
             {% if recommendation.unpack_applied %}
                 <p><strong>Ajuste de Empacotamento:</strong> desmontagem de pack aplicada para caber em 1 volume</p>
             {% endif %}

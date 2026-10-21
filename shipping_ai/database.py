@@ -511,7 +511,10 @@ def get_shipment_history_by_order(db_path, order_id):
                 sh.box_id,
                 sh.quantity,
                 sh.assignments_json,
-                b.name AS box_name
+                b.name AS box_name,
+                b.length_cm,
+                b.width_cm,
+                b.height_cm
             FROM shipment_history sh
             JOIN boxes b ON b.id = sh.box_id
             WHERE sh.order_id = ?
