@@ -48,3 +48,15 @@
 {"level":"info","ts":1792553755.3126588,"logger":"tls.renew","msg":"releasing lock","identifier":"financeiro.local"}
 {"level":"info","ts":1792553755.313243,"logger":"tls","msg":"reloading managed certificate","identifiers":["financeiro.local"]}
 {"level":"info","ts":1792553755.3353739,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["financeiro.local"],"new_expiration":1792596956}
+{"level":"info","ts":1792583155.2666006,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["financeiro.local"],"expiration":1792596956,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":13800.7333994}
+{"level":"info","ts":1792583155.271424,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["financeiro.local"],"remaining":13800.7285759}
+{"level":"info","ts":1792583155.2720797,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["financeiro.local"],"remaining":13800.7279203}
+{"level":"info","ts":1792583155.3016043,"logger":"tls.renew","msg":"acquiring lock","identifier":"financeiro.local"}
+{"level":"info","ts":1792583155.305508,"logger":"tls.renew","msg":"lock acquired","identifier":"financeiro.local"}
+{"level":"info","ts":1792583155.3072977,"logger":"tls.renew","msg":"renewing certificate","identifier":"financeiro.local","remaining":13800.6927022}
+{"level":"info","ts":1792583155.324322,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"financeiro.local","issuer":"local"}
+{"level":"info","ts":1792583155.3250606,"logger":"tls.renew","msg":"releasing lock","identifier":"financeiro.local"}
+{"level":"info","ts":1792583155.3262286,"logger":"tls","msg":"reloading managed certificate","identifiers":["financeiro.local"]}
+{"level":"info","ts":1792583155.3439994,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["financeiro.local"],"new_expiration":1792626356}
+{"level":"info","ts":1792603555.4875276,"logger":"tls","msg":"cleaning storage unit","storage":"FileStorage:C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy"}
+{"level":"info","ts":1792603555.5115478,"logger":"tls","msg":"finished cleaning storage units"}
