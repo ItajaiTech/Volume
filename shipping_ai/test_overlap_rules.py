@@ -38,6 +38,37 @@ class OverlapTests(unittest.TestCase):
         self.assertEqual([(g['blocks'],g['dims']) for g in groups],
                          [(19,[29.6,4.6,7.5]),(1,[15.9,4.6,7.5]),(5,[15.9,4.6,.9])])
 
+    def test_pairing_starts_at_six_packs(self):
+        five_packs=dict(self.item,quantity=50)
+        groups,_ = _build_preview_groups_for_item(five_packs,self.rules)
+        self.assertEqual([(g['blocks'],g['dims']) for g in groups],
+                         [(5,[15.9,4.6,7.5])])
+
+        six_packs=dict(self.item,quantity=60)
+        groups,_ = _build_preview_groups_for_item(six_packs,self.rules)
+        self.assertEqual([(g['blocks'],g['dims']) for g in groups],
+                         [(3,[29.6,4.6,7.5])])
+
+    def test_order_154_fits_caixa_p_below_pairing_threshold(self):
+        desktop=dict(self.item,product_id=22,sku='PRD00009',quantity=20,weight=.023)
+        notebook=dict(product_id=49,sku='PRD00036',name='MEM NB DDR4 16GB',
+                      length_cm=9.52,width_cm=4.6,height_cm=.9,quantity=2,weight=.015)
+        box=dict(id=2,name='Caixa P 15x10x24',length_cm=24,width_cm=15,height_cm=10,
+                 max_weight=.11,max_capacity_weight=30,is_active=1)
+        items=[desktop,notebook]
+        self.assertIsNone(validate_history_plan(
+            [dict(box_id=2,quantity=1,assignments={'22':20,'49':2})],items,[box],self.rules))
+
+    def test_six_packs_need_room_for_the_overlapped_pair(self):
+        item=dict(self.item,quantity=60)
+        p=dict(self.box,id=2,name='P',length_cm=24,width_cm=15,height_cm=10)
+        p2=dict(self.box,id=4,name='P2',length_cm=33,width_cm=24,height_cm=12)
+        p_plan=[dict(box_id=2,quantity=1,assignments={'30':60})]
+        p2_plan=[dict(box_id=4,quantity=1,assignments={'30':60})]
+        self.assertEqual(validate_history_plan(p_plan,[item],[p],self.rules),
+                         'physical_or_pack_capacity_exceeded')
+        self.assertIsNone(validate_history_plan(p2_plan,[item],[p2],self.rules))
+
     def test_scope_disable_and_edit(self):
         self.assertIsNone(self.reason(dict(self.item,sku='OTHER')))
         self.assertEqual(physical_profile(self.item,self.rules),physical_profile(dict(self.item,sku='OTHER'),self.rules))

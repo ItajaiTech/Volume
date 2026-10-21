@@ -321,7 +321,13 @@ def _item_bundle_spec(item_row, packing_rules=None):
         measured = float(_rule_value(packing_rules, f"{profile}_bundle_{dimension}_cm", 0))
         if measured > 0:
             dims[index] = measured
-    spec = {"label": label, "bundle_qty": bundle_qty, "dims": dims, "profile": profile}
+    spec = {
+        "label": label,
+        "bundle_qty": bundle_qty,
+        "dims": dims,
+        "profile": profile,
+        "pair_min_packs": max(2, int(_rule_value(packing_rules, "ram_overlap_min_packs", 6))),
+    }
     if int(_rule_value(packing_rules, "ram_overlap_enabled", 0)):
         tab = float(_rule_value(packing_rules, "ram_blister_tab_cm", 1.2))
         clearance = float(_rule_value(packing_rules, "ram_pair_clearance_cm", 0.2))
@@ -335,7 +341,8 @@ def _item_bundle_spec(item_row, packing_rules=None):
 def _packed_groups(spec, packs):
     """Keep an unpaired pack at its full length; never shrink individual blisters."""
     groups = []
-    if spec.get("pair_dims") and packs >= 2:
+    pair_min_packs = max(2, int(spec.get("pair_min_packs", 2)))
+    if spec.get("pair_dims") and packs >= pair_min_packs:
         groups.append((spec["pair_dims"], packs // 2))
         packs %= 2
     if packs:

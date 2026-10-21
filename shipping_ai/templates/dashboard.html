@@ -92,7 +92,7 @@
         </label>
         <div style="grid-column:1/-1;">
             <h4>Medidas de RAM e demais regras</h4>
-            <p>A sobreposicao vale para RAM DESKTOP/MEM DESK e RAM NOTEBOOK/MEM NB. Comprimento do par = 2 x (comprimento do pack - aba descontada) + folga do par. Exemplo: 2 x (15,9 - 1,2) + 0,2 = 29,6 cm. O par contem dois packs completos; packs sem par e unidades soltas conservam suas medidas individuais. A largura e a altura do par sao as do pack. Zero nas medidas do pack usa o cadastro do produto.</p>
+            <p>A sobreposicao vale para RAM DESKTOP/MEM DESK e RAM NOTEBOOK/MEM NB a partir da quantidade minima de packs configurada. Abaixo desse limite, cada pack conserva suas medidas individuais para permitir outros arranjos na caixa. Comprimento do par = 2 x (comprimento do pack - aba descontada) + folga do par. Exemplo: 2 x (15,9 - 1,2) + 0,2 = 29,6 cm. A largura e a altura do par sao as do pack. Zero nas medidas do pack usa o cadastro do produto.</p>
             <p>As dimensoes individuais dos produtos ficam em <a href="{{ url_for('products') }}">Produtos</a>. Dimensoes e capacidade de peso das caixas, inclusive a caixa padrao de placa-mae, ficam em <a href="{{ url_for('boxes') }}">Caixas</a>.</p>
         </div>
         {% for key, spec in extra_packing_fields.items() %}

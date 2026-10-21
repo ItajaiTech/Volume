@@ -38,3 +38,13 @@
 {"level":"info","ts":1792524355.321226,"logger":"tls.renew","msg":"releasing lock","identifier":"financeiro.local"}
 {"level":"info","ts":1792524355.3223224,"logger":"tls","msg":"reloading managed certificate","identifiers":["financeiro.local"]}
 {"level":"info","ts":1792524355.338814,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["financeiro.local"],"new_expiration":1792567556}
+{"level":"info","ts":1792553755.2664223,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["financeiro.local"],"expiration":1792567556,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":13800.7335777}
+{"level":"info","ts":1792553755.272706,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["financeiro.local"],"remaining":13800.7272939}
+{"level":"info","ts":1792553755.2733934,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["financeiro.local"],"remaining":13800.7266066}
+{"level":"info","ts":1792553755.2952616,"logger":"tls.renew","msg":"acquiring lock","identifier":"financeiro.local"}
+{"level":"info","ts":1792553755.2978568,"logger":"tls.renew","msg":"lock acquired","identifier":"financeiro.local"}
+{"level":"info","ts":1792553755.2992127,"logger":"tls.renew","msg":"renewing certificate","identifier":"financeiro.local","remaining":13800.7007873}
+{"level":"info","ts":1792553755.3126588,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"financeiro.local","issuer":"local"}
+{"level":"info","ts":1792553755.3126588,"logger":"tls.renew","msg":"releasing lock","identifier":"financeiro.local"}
+{"level":"info","ts":1792553755.313243,"logger":"tls","msg":"reloading managed certificate","identifiers":["financeiro.local"]}
+{"level":"info","ts":1792553755.3353739,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["financeiro.local"],"new_expiration":1792596956}
