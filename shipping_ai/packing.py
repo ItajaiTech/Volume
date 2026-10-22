@@ -1112,7 +1112,8 @@ def _build_preview_groups_for_item(item, packing_rules=None, unpack_packs=0):
             f"=> {packed_packs} pack(s) de {bundle_spec['bundle_qty']}."
         )
 
-    if bundle_spec.get("pair_dims") and packed_packs >= 2:
+    pair_min_packs = max(2, int(bundle_spec.get("pair_min_packs", 2)))
+    if bundle_spec.get("pair_dims") and packed_packs >= pair_min_packs:
         note += f" {packed_packs // 2} par(es) com abas sobrepostas: {bundle_spec['pair_dims']} cm."
     return groups, [note]
 

@@ -40,14 +40,16 @@ class OverlapTests(unittest.TestCase):
 
     def test_pairing_starts_at_six_packs(self):
         five_packs=dict(self.item,quantity=50)
-        groups,_ = _build_preview_groups_for_item(five_packs,self.rules)
+        groups,notes = _build_preview_groups_for_item(five_packs,self.rules)
         self.assertEqual([(g['blocks'],g['dims']) for g in groups],
                          [(5,[15.9,4.6,7.5])])
+        self.assertNotIn('sobrepostas', notes[0])
 
         six_packs=dict(self.item,quantity=60)
-        groups,_ = _build_preview_groups_for_item(six_packs,self.rules)
+        groups,notes = _build_preview_groups_for_item(six_packs,self.rules)
         self.assertEqual([(g['blocks'],g['dims']) for g in groups],
                          [(3,[29.6,4.6,7.5])])
+        self.assertIn('3 par(es) com abas sobrepostas', notes[0])
 
     def test_order_154_fits_caixa_p_below_pairing_threshold(self):
         desktop=dict(self.item,product_id=22,sku='PRD00009',quantity=20,weight=.023)
