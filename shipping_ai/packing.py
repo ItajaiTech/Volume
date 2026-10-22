@@ -328,6 +328,9 @@ def _item_bundle_spec(item_row, packing_rules=None):
         "profile": profile,
         "pair_min_packs": max(2, int(_rule_value(packing_rules, "ram_overlap_min_packs", 6))),
     }
+    single_fold = float(_rule_value(packing_rules, "ram_single_fold_cm", 1.0))
+    if 0 < single_fold < dims[0]:
+        spec["folded_dims"] = [dims[0] - single_fold, dims[1], dims[2]]
     if int(_rule_value(packing_rules, "ram_overlap_enabled", 0)):
         tab = float(_rule_value(packing_rules, "ram_blister_tab_cm", 1.2))
         clearance = float(_rule_value(packing_rules, "ram_pair_clearance_cm", 0.2))
@@ -339,14 +342,21 @@ def _item_bundle_spec(item_row, packing_rules=None):
 
 
 def _packed_groups(spec, packs):
-    """Keep an unpaired pack at its full length; never shrink individual blisters."""
+    """Pair packs only at the threshold; individual RAM packs may fold their tip."""
     groups = []
     pair_min_packs = max(2, int(spec.get("pair_min_packs", 2)))
     if spec.get("pair_dims") and packs >= pair_min_packs:
         groups.append((spec["pair_dims"], packs // 2))
         packs %= 2
-    if packs:
-        groups.append((spec["dims"], packs))
+        if packs:
+            groups.append((spec.get("folded_dims") or spec["dims"], packs))
+    elif packs:
+        folded_dims = spec.get("folded_dims") if spec.get("pair_dims") else None
+        regular_packs = packs - 1 if folded_dims else packs
+        if regular_packs:
+            groups.append((spec["dims"], regular_packs))
+        if folded_dims:
+            groups.append((folded_dims, 1))
     return groups
 
 

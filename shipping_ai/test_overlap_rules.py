@@ -36,13 +36,13 @@ class OverlapTests(unittest.TestCase):
         item=dict(self.item,quantity=395)
         groups,_ = _build_preview_groups_for_item(item,self.rules)
         self.assertEqual([(g['blocks'],g['dims']) for g in groups],
-                         [(19,[29.6,4.6,7.5]),(1,[15.9,4.6,7.5]),(5,[15.9,4.6,.9])])
+                         [(19,[29.6,4.6,7.5]),(1,[14.9,4.6,7.5]),(5,[15.9,4.6,.9])])
 
     def test_pairing_starts_at_six_packs(self):
         five_packs=dict(self.item,quantity=50)
         groups,notes = _build_preview_groups_for_item(five_packs,self.rules)
         self.assertEqual([(g['blocks'],g['dims']) for g in groups],
-                         [(5,[15.9,4.6,7.5])])
+                         [(4,[15.9,4.6,7.5]),(1,[14.9,4.6,7.5])])
         self.assertNotIn('sobrepostas', notes[0])
 
         six_packs=dict(self.item,quantity=60)
@@ -50,6 +50,16 @@ class OverlapTests(unittest.TestCase):
         self.assertEqual([(g['blocks'],g['dims']) for g in groups],
                          [(3,[29.6,4.6,7.5])])
         self.assertIn('3 par(es) com abas sobrepostas', notes[0])
+
+    def test_order_158_five_folded_packs_fit_caixa_p(self):
+        item=dict(self.item,product_id=28,sku='PRD00015',quantity=50)
+        box=dict(self.box,id=2,name='Caixa P 15x10x24',
+                 length_cm=24,width_cm=15,height_cm=10)
+        plan=[dict(box_id=2,quantity=1,assignments={'28':50})]
+        self.assertIsNone(validate_history_plan(plan,[item],[box],self.rules))
+        preview=build_packing_3d_preview([item],box,self.rules)
+        self.assertEqual(preview['placed_blocks'],5)
+        self.assertEqual(preview['overflow_blocks'],0)
 
     def test_order_154_fits_caixa_p_below_pairing_threshold(self):
         desktop=dict(self.item,product_id=22,sku='PRD00009',quantity=20,weight=.023)

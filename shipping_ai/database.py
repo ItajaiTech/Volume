@@ -34,6 +34,7 @@ EXTRA_PACKING_FIELDS = {
     "ram_overlap_min_packs": ("RAM DESK e NB - Packs minimos para aplicar sobreposicao", 6, 2, 1000, 1),
     "ram_blister_tab_cm": ("RAM DESK e NB - Aba descontada por blister (cm)", 1.2, 0, 100, 0.1),
     "ram_pair_clearance_cm": ("RAM DESK e NB - Folga total no encontro do par (cm)", 0.2, 0, 100, 0.1),
+    "ram_single_fold_cm": ("RAM DESK e NB - Reducao ao dobrar a ponta do pack individual (cm)", 1.0, 0, 100, 0.1),
     "ram_nb_bundle_length_cm": ("RAM NB - Comprimento do pack (cm; 0 = cadastro)", 0.0, 0, 1000, 0.1),
     "ram_nb_bundle_width_cm": ("RAM NB - Largura do pack (cm; 0 = cadastro)", 0.0, 0, 1000, 0.1),
     "ram_nb_bundle_height_cm": ("RAM NB - Altura do pack (cm; 0 = empilhamento automatico)", 0.0, 0, 1000, 0.1),
