@@ -90,3 +90,58 @@
 {"level":"info","ts":1792671355.3541267,"logger":"tls.renew","msg":"releasing lock","identifier":"financeiro.local"}
 {"level":"info","ts":1792671355.3546762,"logger":"tls","msg":"reloading managed certificate","identifiers":["financeiro.local"]}
 {"level":"info","ts":1792671355.3698993,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["financeiro.local"],"new_expiration":1792714556}
+{"level":"info","ts":1792681136.4347105,"logger":"admin.api","msg":"received request","method":"POST","host":"localhost:2019","uri":"/load","remote_ip":"127.0.0.1","remote_port":"64910","headers":{"User-Agent":["Go-http-client/1.1"],"Content-Length":["3889"],"Caddy-Config-Source-Adapter":["caddyfile"],"Caddy-Config-Source-File":["C:\\Volume\\proxy\\Caddyfile"],"Content-Type":["application/json"],"Origin":["http://localhost:2019"],"Accept-Encoding":["gzip"]}}
+{"level":"info","ts":1792681136.4417818,"logger":"admin","msg":"admin endpoint started","address":"localhost:2019","enforce_origin":false,"origins":["//[::1]:2019","//127.0.0.1:2019","//localhost:2019"]}
+{"level":"info","ts":1792681136.4516444,"logger":"http.auto_https","msg":"skipping automatic certificate management because one or more matching certificates are already loaded","domain":"ponto.local","server_name":"srv0"}
+{"level":"info","ts":1792681136.4516444,"logger":"http.auto_https","msg":"skipping automatic certificate management because one or more matching certificates are already loaded","domain":"ponto.admin","server_name":"srv0"}
+{"level":"info","ts":1792681136.4522297,"logger":"http.auto_https","msg":"skipping automatic certificate management because one or more matching certificates are already loaded","domain":"volume.local","server_name":"srv0"}
+{"level":"info","ts":1792681136.4522297,"logger":"http.auto_https","msg":"automatic HTTP->HTTPS redirects are disabled","server_name":"srv0"}
+{"level":"warn","ts":1792681136.4529219,"logger":"http.auto_https","msg":"server is listening only on the HTTP port, so no automatic HTTPS will be applied to this server","server_name":"srv1","http_port":80}
+{"level":"info","ts":1792681136.4529219,"logger":"http.auto_https","msg":"automatic HTTP->HTTPS redirects are disabled","server_name":"srv3"}
+{"level":"info","ts":1792681136.4922967,"logger":"pki.ca.local","msg":"root certificate is already trusted by system","path":"storage:pki/authorities/local/root.crt"}
+{"level":"info","ts":1792681136.4928038,"logger":"http","msg":"enabling HTTP/3 listener","addr":":8443"}
+{"level":"info","ts":1792681136.4928038,"logger":"http.log","msg":"server running","name":"srv3","protocols":["h1","h2","h3"]}
+{"level":"info","ts":1792681136.4933493,"logger":"http","msg":"enabling HTTP/3 listener","addr":":443"}
+{"level":"info","ts":1792681136.4933493,"logger":"http.log","msg":"server running","name":"srv0","protocols":["h1","h2","h3"]}
+{"level":"warn","ts":1792681136.4939241,"logger":"http","msg":"HTTP/2 skipped because it requires TLS","network":"tcp","addr":":80"}
+{"level":"warn","ts":1792681136.4939241,"logger":"http","msg":"HTTP/3 skipped because it requires TLS","network":"tcp","addr":":80"}
+{"level":"info","ts":1792681136.4944704,"logger":"http.log","msg":"server running","name":"srv1","protocols":["h1","h2","h3"]}
+{"level":"warn","ts":1792681136.4950225,"logger":"http","msg":"HTTP/2 skipped because it requires TLS","network":"tcp","addr":":8080"}
+{"level":"warn","ts":1792681136.4950225,"logger":"http","msg":"HTTP/3 skipped because it requires TLS","network":"tcp","addr":":8080"}
+{"level":"info","ts":1792681136.4950225,"logger":"http.log","msg":"server running","name":"srv2","protocols":["h1","h2","h3"]}
+{"level":"info","ts":1792681136.495605,"logger":"http","msg":"enabling automatic TLS certificate management","domains":["kdt.local","financeiro.local"]}
+{"level":"info","ts":1792681136.496187,"logger":"http","msg":"servers shutting down with eternal grace period"}
+{"level":"info","ts":1792681136.4984627,"msg":"autosaved config (load with --resume flag)","file":"C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy\\autosave.json"}
+{"level":"info","ts":1792681136.4990132,"logger":"admin.api","msg":"load complete"}
+{"level":"info","ts":1792681136.510934,"logger":"admin","msg":"stopped previous server","address":"localhost:2019"}
+{"level":"info","ts":1792681136.5126746,"logger":"tls.obtain","msg":"acquiring lock","identifier":"kdt.local"}
+{"level":"info","ts":1792681136.5144162,"logger":"tls.obtain","msg":"lock acquired","identifier":"kdt.local"}
+{"level":"info","ts":1792681136.515066,"logger":"tls.obtain","msg":"obtaining certificate","identifier":"kdt.local"}
+{"level":"info","ts":1792681136.524443,"logger":"tls","msg":"storage cleaning happened too recently; skipping for now","storage":"FileStorage:C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy","instance":"b54284b6-d6b7-43a3-bd9d-b3a88a8efae2","try_again":1792767536.524443,"try_again_in":86400}
+{"level":"info","ts":1792681136.5251546,"logger":"tls","msg":"finished cleaning storage units"}
+{"level":"info","ts":1792681136.5269012,"logger":"tls.obtain","msg":"certificate obtained successfully","identifier":"kdt.local","issuer":"local"}
+{"level":"info","ts":1792681136.5269012,"logger":"tls.obtain","msg":"releasing lock","identifier":"kdt.local"}
+{"level":"info","ts":1792681481.1185415,"logger":"admin.api","msg":"received request","method":"POST","host":"localhost:2019","uri":"/load","remote_ip":"127.0.0.1","remote_port":"59786","headers":{"Accept-Encoding":["gzip"],"User-Agent":["Go-http-client/1.1"],"Content-Length":["3889"],"Caddy-Config-Source-Adapter":["caddyfile"],"Caddy-Config-Source-File":["C:\\Volume\\proxy\\Caddyfile"],"Content-Type":["application/json"],"Origin":["http://localhost:2019"]}}
+{"level":"info","ts":1792681481.12164,"logger":"admin","msg":"admin endpoint started","address":"localhost:2019","enforce_origin":false,"origins":["//localhost:2019","//[::1]:2019","//127.0.0.1:2019"]}
+{"level":"info","ts":1792681481.1250799,"logger":"http.auto_https","msg":"skipping automatic certificate management because one or more matching certificates are already loaded","domain":"volume.local","server_name":"srv0"}
+{"level":"info","ts":1792681481.1250799,"logger":"http.auto_https","msg":"skipping automatic certificate management because one or more matching certificates are already loaded","domain":"ponto.local","server_name":"srv0"}
+{"level":"info","ts":1792681481.1256714,"logger":"http.auto_https","msg":"skipping automatic certificate management because one or more matching certificates are already loaded","domain":"ponto.admin","server_name":"srv0"}
+{"level":"info","ts":1792681481.1256714,"logger":"http.auto_https","msg":"automatic HTTP->HTTPS redirects are disabled","server_name":"srv0"}
+{"level":"warn","ts":1792681481.1261892,"logger":"http.auto_https","msg":"server is listening only on the HTTP port, so no automatic HTTPS will be applied to this server","server_name":"srv1","http_port":80}
+{"level":"info","ts":1792681481.1261892,"logger":"http.auto_https","msg":"automatic HTTP->HTTPS redirects are disabled","server_name":"srv3"}
+{"level":"info","ts":1792681481.1292293,"logger":"pki.ca.local","msg":"root certificate is already trusted by system","path":"storage:pki/authorities/local/root.crt"}
+{"level":"warn","ts":1792681481.1292293,"logger":"http","msg":"HTTP/2 skipped because it requires TLS","network":"tcp","addr":":8080"}
+{"level":"warn","ts":1792681481.1300082,"logger":"http","msg":"HTTP/3 skipped because it requires TLS","network":"tcp","addr":":8080"}
+{"level":"info","ts":1792681481.1300082,"logger":"http.log","msg":"server running","name":"srv2","protocols":["h1","h2","h3"]}
+{"level":"info","ts":1792681481.1305492,"logger":"http","msg":"enabling HTTP/3 listener","addr":":8443"}
+{"level":"info","ts":1792681481.1311767,"logger":"http.log","msg":"server running","name":"srv3","protocols":["h1","h2","h3"]}
+{"level":"info","ts":1792681481.1311767,"logger":"http","msg":"enabling HTTP/3 listener","addr":":443"}
+{"level":"info","ts":1792681481.1311767,"logger":"http.log","msg":"server running","name":"srv0","protocols":["h1","h2","h3"]}
+{"level":"warn","ts":1792681481.1317794,"logger":"http","msg":"HTTP/2 skipped because it requires TLS","network":"tcp","addr":":80"}
+{"level":"warn","ts":1792681481.1317794,"logger":"http","msg":"HTTP/3 skipped because it requires TLS","network":"tcp","addr":":80"}
+{"level":"info","ts":1792681481.1323767,"logger":"http.log","msg":"server running","name":"srv1","protocols":["h1","h2","h3"]}
+{"level":"info","ts":1792681481.1323767,"logger":"http","msg":"enabling automatic TLS certificate management","domains":["financeiro.local","kdt.local"]}
+{"level":"info","ts":1792681481.1323767,"logger":"http","msg":"servers shutting down with eternal grace period"}
+{"level":"info","ts":1792681481.1341987,"msg":"autosaved config (load with --resume flag)","file":"C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy\\autosave.json"}
+{"level":"info","ts":1792681481.1348023,"logger":"admin.api","msg":"load complete"}
+{"level":"info","ts":1792681481.139395,"logger":"admin","msg":"stopped previous server","address":"localhost:2019"}
