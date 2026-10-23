@@ -1,4 +1,4 @@
-{
+﻿{
     # Keep redirects explicit, but allow `tls internal` to issue and renew the
     # local certificate for financeiro.local.
     auto_https disable_redirects
@@ -17,7 +17,7 @@ http://volume.local {
 }
 
 https://ponto.local {
-    tls C:\RelogioPonto\Ponto\certs\ponto.crt C:\RelogioPonto\Ponto\certs\ponto.key
+    tls internal
     reverse_proxy https://127.0.0.1:5000 {
         transport http {
             tls_insecure_skip_verify
@@ -27,7 +27,7 @@ https://ponto.local {
 }
 
 https://ponto.admin {
-    tls C:\RelogioPonto\Ponto\certs\ponto.crt C:\RelogioPonto\Ponto\certs\ponto.key
+    tls internal
     reverse_proxy https://127.0.0.1:5000 {
         transport http {
             tls_insecure_skip_verify
@@ -37,12 +37,17 @@ https://ponto.admin {
 }
 
 https://volume.local {
-    tls C:\Volume\shipping_ai\certs\volume.local.crt C:\Volume\shipping_ai\certs\volume.local.key
+    tls internal
     reverse_proxy http://127.0.0.1:6100 {
         header_up X-Forwarded-Proto https
     }
 }
 
+# Direct IP access: Caddy manages a separate internal certificate for the LAN IP.
+https://192.168.1.10 {
+    tls internal
+    respond "Caddy HTTPS ativo. Use o domínio do sistema desejado." 200
+}
 # FIN / WordPress is served by Apache internally. Caddy owns the public
 # local ports and supplies a locally trusted HTTPS certificate.
 http://financeiro.local:8080 {
@@ -78,3 +83,19 @@ https://financeiro.local:8443 {
 http://:8080 {
     reverse_proxy http://127.0.0.1:8081
 }
+
+# FIN: HTTPS on the standard port 443; port 8443 remains available for compatibility.
+http://financeiro.local {
+    redir https://financeiro.local{uri} 308
+}
+
+https://financeiro.local {
+    tls internal
+    reverse_proxy http://127.0.0.1:8081 {
+        header_up Host {host}
+        header_up X-Forwarded-Host {host}
+        header_up X-Forwarded-Proto https
+        header_up X-Forwarded-Port 443
+    }
+}
+

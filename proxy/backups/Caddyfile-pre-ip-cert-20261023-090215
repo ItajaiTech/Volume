@@ -1,0 +1,95 @@
+{
+    # Keep redirects explicit, but allow `tls internal` to issue and renew the
+    # local certificate for financeiro.local.
+    auto_https disable_redirects
+}
+
+http://ponto.local {
+    redir https://ponto.local{uri} 301
+}
+
+http://ponto.admin {
+    redir https://ponto.admin{uri} 301
+}
+
+http://volume.local {
+    redir https://volume.local{uri} 301
+}
+
+https://ponto.local {
+    tls internal
+    reverse_proxy https://127.0.0.1:5000 {
+        transport http {
+            tls_insecure_skip_verify
+        }
+        header_up X-Forwarded-Proto https
+    }
+}
+
+https://ponto.admin {
+    tls internal
+    reverse_proxy https://127.0.0.1:5000 {
+        transport http {
+            tls_insecure_skip_verify
+        }
+        header_up X-Forwarded-Proto https
+    }
+}
+
+https://volume.local {
+    tls internal
+    reverse_proxy http://127.0.0.1:6100 {
+        header_up X-Forwarded-Proto https
+    }
+}
+
+# FIN / WordPress is served by Apache internally. Caddy owns the public
+# local ports and supplies a locally trusted HTTPS certificate.
+http://financeiro.local:8080 {
+    redir https://financeiro.local:8443{uri} 308
+}
+
+# KDT is served by the shared XAMPP/Apache instance. Caddy terminates HTTPS
+# with its local CA while Apache remains on the existing internal port.
+http://kdt.local {
+    redir https://kdt.local{uri} 308
+}
+
+https://kdt.local {
+    tls internal
+    reverse_proxy http://127.0.0.1:9073 {
+        header_up Host {host}
+        header_up X-Forwarded-Proto https
+        header_up X-Forwarded-Port 443
+    }
+}
+
+https://financeiro.local:8443 {
+    tls internal
+    reverse_proxy http://127.0.0.1:8081 {
+        header_up Host {http.request.host}:{http.request.port}
+        header_up X-Forwarded-Host {host}
+        header_up X-Forwarded-Proto https
+        header_up X-Forwarded-Port 8443
+    }
+}
+
+# Keeps existing local HTTP addresses working after Apache moves to 8081.
+http://:8080 {
+    reverse_proxy http://127.0.0.1:8081
+}
+
+# FIN: HTTPS on the standard port 443; port 8443 remains available for compatibility.
+http://financeiro.local {
+    redir https://financeiro.local{uri} 308
+}
+
+https://financeiro.local {
+    tls internal
+    reverse_proxy http://127.0.0.1:8081 {
+        header_up Host {host}
+        header_up X-Forwarded-Host {host}
+        header_up X-Forwarded-Proto https
+        header_up X-Forwarded-Port 443
+    }
+}
