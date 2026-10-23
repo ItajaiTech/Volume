@@ -43,6 +43,11 @@ https://volume.local {
     }
 }
 
+# Portal de instalacao da autoridade certificadora publica (acesso inicial por HTTP).
+http://192.168.1.10 {
+    root * C:\xampp\caddy-ca-distribution
+    file_server
+}
 # Direct IP access: Caddy manages a separate internal certificate for the LAN IP.
 https://192.168.1.10 {
     tls internal
@@ -98,4 +103,5 @@ https://financeiro.local {
         header_up X-Forwarded-Port 443
     }
 }
+
 
