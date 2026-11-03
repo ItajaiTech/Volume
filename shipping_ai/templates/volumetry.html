@@ -106,6 +106,23 @@
     flex-wrap: wrap;
     margin-top: 4px;
 }
+.repeat-package {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+    font-size: 0.8rem;
+}
+.repeat-package input {
+    width: 65px;
+    padding: 4px 6px;
+}
+.repeat-error {
+    color: #b91c1c;
+    font-size: 0.8rem;
+    margin: 4px 0 0;
+}
 .btn-xs {
     background: #e2e8f0;
     color: #0f172a;
@@ -361,6 +378,44 @@ function removePackage(id) {
     updateRemaining();
 }
 
+function repeatPackage(id) {
+    const pkg = packages.find(p => p.id === id);
+    if (!pkg) return;
+
+    const input = document.getElementById(`repeat-count-${id}`);
+    const error = document.getElementById(`repeat-error-${id}`);
+    error.textContent = '';
+    const count = Number(input.value);
+
+    if (!Number.isSafeInteger(count) || count < 1) {
+        error.textContent = 'Informe uma quantidade inteira de cópias maior que zero.';
+        return;
+    }
+    if (!pkg.boxData) {
+        error.textContent = 'Selecione uma embalagem antes de repetir.';
+        return;
+    }
+    const assignedItems = ITEMS.filter(item => pkg.assignments[item.product_id] > 0);
+    if (!assignedItems.length) {
+        error.textContent = 'Adicione produtos à embalagem antes de repetir.';
+        return;
+    }
+
+    for (const item of assignedItems) {
+        const assigned = packages.reduce((sum, p) => sum + (p.assignments[item.product_id] || 0), 0);
+        const remaining = item.quantity - assigned;
+        const maxCopies = Math.max(0, Math.floor(remaining / pkg.assignments[item.product_id]));
+        if (count > maxCopies) {
+            error.textContent = `Saldo insuficiente para ${item.sku || item.name}. É possível criar até ${maxCopies} cópia(s).`;
+            return;
+        }
+    }
+
+    for (let i = 0; i < count; i++) {
+        addPackage(pkg.boxId, pkg.assignments);
+    }
+}
+
 function refreshAllBadges() {
     packages.forEach((pkg, idx) => {
         const badge = document.getElementById('badge-' + pkg.id);
@@ -435,6 +490,13 @@ function rerenderPackage(id) {
         <button class="btn-xs" type="button" onclick="autoFillRemaining(${id})">Preencher restantes</button>
         <button class="btn-xs" type="button" onclick="clearPackage(${id})">Limpar itens</button>
     </div>
+
+    <div class="repeat-package">
+        <label for="repeat-count-${id}">Cópias adicionais</label>
+        <input type="number" id="repeat-count-${id}" min="1" step="1" value="1">
+        <button class="btn-xs" type="button" onclick="repeatPackage(${id})">Repetir embalagem</button>
+    </div>
+    <p class="repeat-error" id="repeat-error-${id}" role="alert"></p>
 
     <div style="margin-top:10px;">
         <table class="pkg-table">
