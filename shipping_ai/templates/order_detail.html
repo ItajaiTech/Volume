@@ -147,8 +147,10 @@
         <p><strong>Volume total dos produtos:</strong> {{ ('%.2f'|format(recommendation.totals.total_volume_cm3))|replace('.', ',') }} cm³ / {{ ('%.8f'|format(recommendation.totals.total_volume_cm3 / 1000000))|replace('.', ',') }} m³</p>
         {% set shipping_summary = namespace(plan=[], packages=0, volume_cm3=0) %}
         {% if shipments %}
-            {% for sh in shipments %}
-                {% set shipping_summary.plan = shipping_summary.plan + [{'box': sh, 'name': sh['box_name'], 'quantity': sh['quantity']}] %}
+            {% for box_id, matching_shipments in shipments|groupby('box_id') %}
+                {% set sh = matching_shipments|first %}
+                {% set box_quantity = matching_shipments|sum(attribute='quantity') %}
+                {% set shipping_summary.plan = shipping_summary.plan + [{'box': sh, 'name': sh['box_name'], 'quantity': box_quantity}] %}
             {% endfor %}
         {% elif recommendation.history_plan %}
             {% for entry in recommendation.history_plan %}
@@ -161,7 +163,7 @@
             {% set box_volume = entry.box['length_cm'] * entry.box['width_cm'] * entry.box['height_cm'] %}
             {% set shipping_summary.packages = shipping_summary.packages + entry.quantity %}
             {% set shipping_summary.volume_cm3 = shipping_summary.volume_cm3 + box_volume * entry.quantity %}
-            <p><strong>{% if shipments %}Caixa do plano manual{% else %}Caixa indicada{% endif %}:</strong> {{ entry.name }} — {{ entry.quantity }} volume(s)<br>
+            <p><strong>{% if shipments %}Caixa do plano manual{% else %}Caixa indicada{% endif %}:</strong> {{ entry.quantity }}× {{ entry.name }} — {{ entry.quantity }} volume(s)<br>
                 <strong>Dimensões (C × L × A):</strong> {{ '%g'|format(entry.box['length_cm']) }} × {{ '%g'|format(entry.box['width_cm']) }} × {{ '%g'|format(entry.box['height_cm']) }} cm<br>
                 <strong>Volume por caixa:</strong> {{ ('%.2f'|format(box_volume))|replace('.', ',') }} cm³ / {{ ('%.8f'|format(box_volume / 1000000))|replace('.', ',') }} m³
             </p>
