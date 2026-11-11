@@ -75,3 +75,185 @@
 {"level":"info","ts":1794310850.070886,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["ponto.admin"],"new_expiration":1794354051}
 {"level":"info","ts":1794310850.07311,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["ponto.local"],"new_expiration":1794354051}
 {"level":"info","ts":1794310850.073675,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["kdt.local"],"new_expiration":1794354051}
+{"level":"info","ts":1794339652.2218766,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["ponto.admin"],"expiration":1794354051,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":14398.7781232}
+{"level":"info","ts":1794339652.2692077,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["kdt.local"],"expiration":1794354051,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":14398.7307922}
+{"level":"info","ts":1794339652.308183,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["ponto.local"],"expiration":1794354051,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":14398.691817}
+{"level":"info","ts":1794339652.3413858,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["financeiro.local"],"expiration":1794354051,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":14398.6586143}
+{"level":"info","ts":1794339652.379629,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["volume.local"],"expiration":1794354051,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":14398.6203712}
+{"level":"info","ts":1794339652.4107733,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":[],"expiration":1794354051,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":14398.5892267}
+{"level":"info","ts":1794339652.4388797,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["ponto.admin"],"remaining":14398.5611203}
+{"level":"info","ts":1794339652.4395206,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["kdt.local"],"remaining":14398.5604795}
+{"level":"info","ts":1794339652.4395206,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["ponto.local"],"remaining":14398.5604795}
+{"level":"info","ts":1794339652.4401836,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["financeiro.local"],"remaining":14398.5598164}
+{"level":"info","ts":1794339652.4401836,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["volume.local"],"remaining":14398.5598164}
+{"level":"info","ts":1794339652.4407618,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["192.168.1.10"],"remaining":14398.5592382}
+{"level":"info","ts":1794339652.4407618,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["192.168.1.10"],"remaining":14398.5592382}
+{"level":"info","ts":1794339652.4401836,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["financeiro.local"],"remaining":14398.5598164}
+{"level":"info","ts":1794339652.4401836,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["ponto.local"],"remaining":14398.5598164}
+{"level":"info","ts":1794339652.4395206,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["kdt.local"],"remaining":14398.5604795}
+{"level":"info","ts":1794339652.4407618,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["volume.local"],"remaining":14398.5592382}
+{"level":"info","ts":1794339652.4395206,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["ponto.admin"],"remaining":14398.5604795}
+{"level":"info","ts":1794339652.4605172,"logger":"tls.renew","msg":"acquiring lock","identifier":"192.168.1.10"}
+{"level":"info","ts":1794339652.4610882,"logger":"tls.renew","msg":"acquiring lock","identifier":"ponto.local"}
+{"level":"info","ts":1794339652.4639196,"logger":"tls.renew","msg":"lock acquired","identifier":"192.168.1.10"}
+{"level":"info","ts":1794339652.4639196,"logger":"tls.renew","msg":"acquiring lock","identifier":"kdt.local"}
+{"level":"info","ts":1794339652.4639196,"logger":"tls.renew","msg":"lock acquired","identifier":"ponto.local"}
+{"level":"info","ts":1794339652.4651654,"logger":"tls.renew","msg":"acquiring lock","identifier":"financeiro.local"}
+{"level":"info","ts":1794339652.4663959,"logger":"tls.renew","msg":"renewing certificate","identifier":"192.168.1.10","remaining":14398.533604}
+{"level":"info","ts":1794339652.4663959,"logger":"tls.renew","msg":"renewing certificate","identifier":"ponto.local","remaining":14398.533604}
+{"level":"info","ts":1794339652.4663959,"logger":"tls.renew","msg":"lock acquired","identifier":"kdt.local"}
+{"level":"info","ts":1794339652.4663959,"logger":"tls.renew","msg":"acquiring lock","identifier":"volume.local"}
+{"level":"info","ts":1794339652.466987,"logger":"tls.renew","msg":"acquiring lock","identifier":"ponto.admin"}
+{"level":"info","ts":1794339652.4681563,"logger":"tls.renew","msg":"lock acquired","identifier":"financeiro.local"}
+{"level":"info","ts":1794339652.4681563,"logger":"tls.renew","msg":"renewing certificate","identifier":"kdt.local","remaining":14398.5318436}
+{"level":"info","ts":1794339652.470455,"logger":"tls.renew","msg":"renewing certificate","identifier":"financeiro.local","remaining":14398.529545}
+{"level":"info","ts":1794339652.470455,"logger":"tls.renew","msg":"lock acquired","identifier":"volume.local"}
+{"level":"info","ts":1794339652.470455,"logger":"tls.renew","msg":"lock acquired","identifier":"ponto.admin"}
+{"level":"info","ts":1794339652.4721594,"logger":"tls.renew","msg":"renewing certificate","identifier":"volume.local","remaining":14398.5278405}
+{"level":"info","ts":1794339652.4727604,"logger":"tls.renew","msg":"renewing certificate","identifier":"ponto.admin","remaining":14398.5272396}
+{"level":"info","ts":1794339652.4902687,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"ponto.local","issuer":"local"}
+{"level":"info","ts":1794339652.4902687,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"volume.local","issuer":"local"}
+{"level":"info","ts":1794339652.4924273,"logger":"tls.renew","msg":"releasing lock","identifier":"ponto.local"}
+{"level":"info","ts":1794339652.4928372,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"kdt.local","issuer":"local"}
+{"level":"info","ts":1794339652.4933476,"logger":"tls","msg":"reloading managed certificate","identifiers":["ponto.local"]}
+{"level":"info","ts":1794339652.4933476,"logger":"tls.renew","msg":"releasing lock","identifier":"kdt.local"}
+{"level":"info","ts":1794339652.4928372,"logger":"tls.renew","msg":"releasing lock","identifier":"volume.local"}
+{"level":"info","ts":1794339652.4947836,"logger":"tls","msg":"reloading managed certificate","identifiers":["kdt.local"]}
+{"level":"info","ts":1794339652.4954107,"logger":"tls","msg":"reloading managed certificate","identifiers":["volume.local"]}
+{"level":"info","ts":1794339652.4971254,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"192.168.1.10","issuer":"local"}
+{"level":"info","ts":1794339652.4977038,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"financeiro.local","issuer":"local"}
+{"level":"info","ts":1794339652.4982722,"logger":"tls.renew","msg":"releasing lock","identifier":"financeiro.local"}
+{"level":"info","ts":1794339652.4977038,"logger":"tls.renew","msg":"releasing lock","identifier":"192.168.1.10"}
+{"level":"info","ts":1794339652.4988315,"logger":"tls","msg":"reloading managed certificate","identifiers":["financeiro.local"]}
+{"level":"info","ts":1794339652.499454,"logger":"tls","msg":"reloading managed certificate","identifiers":["192.168.1.10"]}
+{"level":"info","ts":1794339652.5023437,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"ponto.admin","issuer":"local"}
+{"level":"info","ts":1794339652.502911,"logger":"tls.renew","msg":"releasing lock","identifier":"ponto.admin"}
+{"level":"info","ts":1794339652.5034938,"logger":"tls","msg":"reloading managed certificate","identifiers":["ponto.admin"]}
+{"level":"info","ts":1794339652.5046704,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["volume.local"],"new_expiration":1794382853}
+{"level":"info","ts":1794339652.5053432,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["ponto.local"],"new_expiration":1794382853}
+{"level":"info","ts":1794339652.5093544,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["kdt.local"],"new_expiration":1794382853}
+{"level":"info","ts":1794339652.5115716,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["ponto.admin"],"new_expiration":1794382853}
+{"level":"info","ts":1794339652.5115716,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["financeiro.local"],"new_expiration":1794382853}
+{"level":"info","ts":1794339652.5133688,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["192.168.1.10"],"new_expiration":1794382853}
+{"level":"info","ts":1794369052.219716,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["ponto.admin"],"expiration":1794382853,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":13800.7802838}
+{"level":"info","ts":1794369052.2618625,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["kdt.local"],"expiration":1794382853,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":13800.7381377}
+{"level":"info","ts":1794369052.2967057,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["ponto.local"],"expiration":1794382853,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":13800.7032942}
+{"level":"info","ts":1794369052.3300526,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["financeiro.local"],"expiration":1794382853,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":13800.6699473}
+{"level":"info","ts":1794369052.3593206,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["volume.local"],"expiration":1794382853,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":13800.6406793}
+{"level":"info","ts":1794369052.3880038,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":[],"expiration":1794382853,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":13800.6119961}
+{"level":"info","ts":1794369052.4166865,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["ponto.admin"],"remaining":13800.5833134}
+{"level":"info","ts":1794369052.4171982,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["kdt.local"],"remaining":13800.5828019}
+{"level":"info","ts":1794369052.4177825,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["ponto.local"],"remaining":13800.5822174}
+{"level":"info","ts":1794369052.418363,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["financeiro.local"],"remaining":13800.5816368}
+{"level":"info","ts":1794369052.418363,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["volume.local"],"remaining":13800.5816368}
+{"level":"info","ts":1794369052.4190128,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["192.168.1.10"],"remaining":13800.5809872}
+{"level":"info","ts":1794369052.4196274,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["192.168.1.10"],"remaining":13800.5803725}
+{"level":"info","ts":1794369052.4177825,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["kdt.local"],"remaining":13800.5822174}
+{"level":"info","ts":1794369052.418363,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["financeiro.local"],"remaining":13800.5816368}
+{"level":"info","ts":1794369052.4171982,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["ponto.admin"],"remaining":13800.5828019}
+{"level":"info","ts":1794369052.4190128,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["volume.local"],"remaining":13800.5809872}
+{"level":"info","ts":1794369052.418363,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["ponto.local"],"remaining":13800.5816368}
+{"level":"info","ts":1794369052.4387834,"logger":"tls.renew","msg":"acquiring lock","identifier":"financeiro.local"}
+{"level":"info","ts":1794369052.439992,"logger":"tls.renew","msg":"acquiring lock","identifier":"192.168.1.10"}
+{"level":"info","ts":1794369052.4417317,"logger":"tls.renew","msg":"lock acquired","identifier":"financeiro.local"}
+{"level":"info","ts":1794369052.4423475,"logger":"tls.renew","msg":"lock acquired","identifier":"192.168.1.10"}
+{"level":"info","ts":1794369052.4435189,"logger":"tls.renew","msg":"acquiring lock","identifier":"kdt.local"}
+{"level":"info","ts":1794369052.4435189,"logger":"tls.renew","msg":"renewing certificate","identifier":"192.168.1.10","remaining":13800.556481}
+{"level":"info","ts":1794369052.4440978,"logger":"tls.renew","msg":"renewing certificate","identifier":"financeiro.local","remaining":13800.5559021}
+{"level":"info","ts":1794369052.4458992,"logger":"tls.renew","msg":"acquiring lock","identifier":"ponto.admin"}
+{"level":"info","ts":1794369052.4464936,"logger":"tls.renew","msg":"lock acquired","identifier":"kdt.local"}
+{"level":"info","ts":1794369052.4489615,"logger":"tls.renew","msg":"renewing certificate","identifier":"kdt.local","remaining":13800.5510385}
+{"level":"info","ts":1794369052.4495103,"logger":"tls.renew","msg":"acquiring lock","identifier":"ponto.local"}
+{"level":"info","ts":1794369052.450079,"logger":"tls.renew","msg":"lock acquired","identifier":"ponto.admin"}
+{"level":"info","ts":1794369052.452454,"logger":"tls.renew","msg":"acquiring lock","identifier":"volume.local"}
+{"level":"info","ts":1794369052.4529982,"logger":"tls.renew","msg":"renewing certificate","identifier":"ponto.admin","remaining":13800.5470018}
+{"level":"info","ts":1794369052.4541178,"logger":"tls.renew","msg":"lock acquired","identifier":"ponto.local"}
+{"level":"info","ts":1794369052.4564605,"logger":"tls.renew","msg":"renewing certificate","identifier":"ponto.local","remaining":13800.5435395}
+{"level":"info","ts":1794369052.4572463,"logger":"tls.renew","msg":"lock acquired","identifier":"volume.local"}
+{"level":"info","ts":1794369052.4596362,"logger":"tls.renew","msg":"renewing certificate","identifier":"volume.local","remaining":13800.5403638}
+{"level":"info","ts":1794369052.4655244,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"financeiro.local","issuer":"local"}
+{"level":"info","ts":1794369052.4662137,"logger":"tls.renew","msg":"releasing lock","identifier":"financeiro.local"}
+{"level":"info","ts":1794369052.4671872,"logger":"tls","msg":"reloading managed certificate","identifiers":["financeiro.local"]}
+{"level":"info","ts":1794369052.468919,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"192.168.1.10","issuer":"local"}
+{"level":"info","ts":1794369052.470727,"logger":"tls.renew","msg":"releasing lock","identifier":"192.168.1.10"}
+{"level":"info","ts":1794369052.4713087,"logger":"tls","msg":"reloading managed certificate","identifiers":["192.168.1.10"]}
+{"level":"info","ts":1794369052.4713087,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"kdt.local","issuer":"local"}
+{"level":"info","ts":1794369052.4732566,"logger":"tls.renew","msg":"releasing lock","identifier":"kdt.local"}
+{"level":"info","ts":1794369052.4738197,"logger":"tls","msg":"reloading managed certificate","identifiers":["kdt.local"]}
+{"level":"info","ts":1794369052.4761531,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"ponto.admin","issuer":"local"}
+{"level":"info","ts":1794369052.4767406,"logger":"tls.renew","msg":"releasing lock","identifier":"ponto.admin"}
+{"level":"info","ts":1794369052.4774473,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"ponto.local","issuer":"local"}
+{"level":"info","ts":1794369052.4774473,"logger":"tls","msg":"reloading managed certificate","identifiers":["ponto.admin"]}
+{"level":"info","ts":1794369052.4780586,"logger":"tls.renew","msg":"releasing lock","identifier":"ponto.local"}
+{"level":"info","ts":1794369052.4786696,"logger":"tls","msg":"reloading managed certificate","identifiers":["ponto.local"]}
+{"level":"info","ts":1794369052.4792259,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"volume.local","issuer":"local"}
+{"level":"info","ts":1794369052.4797807,"logger":"tls.renew","msg":"releasing lock","identifier":"volume.local"}
+{"level":"info","ts":1794369052.480341,"logger":"tls","msg":"reloading managed certificate","identifiers":["volume.local"]}
+{"level":"info","ts":1794369052.4814694,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["financeiro.local"],"new_expiration":1794412253}
+{"level":"info","ts":1794369052.4837303,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["192.168.1.10"],"new_expiration":1794412253}
+{"level":"info","ts":1794369052.4849806,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["kdt.local"],"new_expiration":1794412253}
+{"level":"info","ts":1794369052.486741,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["ponto.admin"],"new_expiration":1794412253}
+{"level":"info","ts":1794369052.4890501,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["ponto.local"],"new_expiration":1794412253}
+{"level":"info","ts":1794369052.4913185,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["volume.local"],"new_expiration":1794412253}
+{"level":"info","ts":1794397252.4000845,"logger":"tls","msg":"cleaning storage unit","storage":"FileStorage:C:\\Users\\WillianMiranda-Itaja\\AppData\\Roaming\\Caddy"}
+{"level":"info","ts":1794397252.423524,"logger":"tls","msg":"finished cleaning storage units"}
+{"level":"info","ts":1794398452.219463,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["ponto.local"],"expiration":1794412253,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":13800.7805368}
+{"level":"info","ts":1794398452.255355,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["financeiro.local"],"expiration":1794412253,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":13800.7446451}
+{"level":"info","ts":1794398452.292764,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["volume.local"],"expiration":1794412253,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":13800.7072361}
+{"level":"info","ts":1794398452.3218977,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":[],"expiration":1794412253,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":13800.6781023}
+{"level":"info","ts":1794398452.3508594,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["ponto.admin"],"expiration":1794412253,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":13800.6491406}
+{"level":"info","ts":1794398452.3788776,"logger":"tls","msg":"certificate is in configured renewal window based on expiration date","subjects":["kdt.local"],"expiration":1794412253,"ari_cert_id":"","next_ari_update":null,"renew_check_interval":600,"window_start":-6795364578.8713455,"window_end":-6795364578.8713455,"remaining":13800.6211223}
+{"level":"info","ts":1794398452.405755,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["ponto.local"],"remaining":13800.5942449}
+{"level":"info","ts":1794398452.406263,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["financeiro.local"],"remaining":13800.5937369}
+{"level":"info","ts":1794398452.4068358,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["volume.local"],"remaining":13800.5931644}
+{"level":"info","ts":1794398452.4068358,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["192.168.1.10"],"remaining":13800.5931644}
+{"level":"info","ts":1794398452.4075062,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["ponto.admin"],"remaining":13800.5924939}
+{"level":"info","ts":1794398452.4080703,"logger":"tls.cache.maintenance","msg":"certificate expires soon; queuing for renewal","identifiers":["kdt.local"],"remaining":13800.5919295}
+{"level":"info","ts":1794398452.4075062,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["volume.local"],"remaining":13800.5924939}
+{"level":"info","ts":1794398452.406263,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["ponto.local"],"remaining":13800.5937369}
+{"level":"info","ts":1794398452.4075062,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["192.168.1.10"],"remaining":13800.5924939}
+{"level":"info","ts":1794398452.4068358,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["financeiro.local"],"remaining":13800.5931644}
+{"level":"info","ts":1794398452.4080703,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["ponto.admin"],"remaining":13800.5919295}
+{"level":"info","ts":1794398452.4087126,"logger":"tls.cache.maintenance","msg":"attempting certificate renewal","identifiers":["kdt.local"],"remaining":13800.5912873}
+{"level":"info","ts":1794398452.4287462,"logger":"tls.renew","msg":"acquiring lock","identifier":"ponto.admin"}
+{"level":"info","ts":1794398452.4310384,"logger":"tls.renew","msg":"acquiring lock","identifier":"ponto.local"}
+{"level":"info","ts":1794398452.4310384,"logger":"tls.renew","msg":"acquiring lock","identifier":"volume.local"}
+{"level":"info","ts":1794398452.432194,"logger":"tls.renew","msg":"lock acquired","identifier":"ponto.admin"}
+{"level":"info","ts":1794398452.4333208,"logger":"tls.renew","msg":"renewing certificate","identifier":"ponto.admin","remaining":13800.5666793}
+{"level":"info","ts":1794398452.4338734,"logger":"tls.renew","msg":"lock acquired","identifier":"ponto.local"}
+{"level":"info","ts":1794398452.4344223,"logger":"tls.renew","msg":"acquiring lock","identifier":"kdt.local"}
+{"level":"info","ts":1794398452.4344223,"logger":"tls.renew","msg":"acquiring lock","identifier":"financeiro.local"}
+{"level":"info","ts":1794398452.4349747,"logger":"tls.renew","msg":"lock acquired","identifier":"volume.local"}
+{"level":"info","ts":1794398452.4355423,"logger":"tls.renew","msg":"renewing certificate","identifier":"ponto.local","remaining":13800.5644578}
+{"level":"info","ts":1794398452.4366643,"logger":"tls.renew","msg":"renewing certificate","identifier":"volume.local","remaining":13800.5633357}
+{"level":"info","ts":1794398452.4378538,"logger":"tls.renew","msg":"lock acquired","identifier":"kdt.local"}
+{"level":"info","ts":1794398452.4378538,"logger":"tls.renew","msg":"lock acquired","identifier":"financeiro.local"}
+{"level":"info","ts":1794398452.4384203,"logger":"tls.renew","msg":"acquiring lock","identifier":"192.168.1.10"}
+{"level":"info","ts":1794398452.4412887,"logger":"tls.renew","msg":"renewing certificate","identifier":"financeiro.local","remaining":13800.5592862}
+{"level":"info","ts":1794398452.4412887,"logger":"tls.renew","msg":"renewing certificate","identifier":"kdt.local","remaining":13800.5587114}
+{"level":"info","ts":1794398452.4430366,"logger":"tls.renew","msg":"lock acquired","identifier":"192.168.1.10"}
+{"level":"info","ts":1794398452.445934,"logger":"tls.renew","msg":"renewing certificate","identifier":"192.168.1.10","remaining":13800.554066}
+{"level":"info","ts":1794398452.451401,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"ponto.admin","issuer":"local"}
+{"level":"info","ts":1794398452.453137,"logger":"tls.renew","msg":"releasing lock","identifier":"ponto.admin"}
+{"level":"info","ts":1794398452.45439,"logger":"tls","msg":"reloading managed certificate","identifiers":["ponto.admin"]}
+{"level":"info","ts":1794398452.4575477,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"ponto.local","issuer":"local"}
+{"level":"info","ts":1794398452.4582613,"logger":"tls.renew","msg":"releasing lock","identifier":"ponto.local"}
+{"level":"info","ts":1794398452.4595225,"logger":"tls","msg":"reloading managed certificate","identifiers":["ponto.local"]}
+{"level":"info","ts":1794398452.4633431,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"kdt.local","issuer":"local"}
+{"level":"info","ts":1794398452.464076,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"volume.local","issuer":"local"}
+{"level":"info","ts":1794398452.464076,"logger":"tls.renew","msg":"releasing lock","identifier":"kdt.local"}
+{"level":"info","ts":1794398452.4646423,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"financeiro.local","issuer":"local"}
+{"level":"info","ts":1794398452.4652026,"logger":"tls.renew","msg":"releasing lock","identifier":"volume.local"}
+{"level":"info","ts":1794398452.466354,"logger":"tls","msg":"reloading managed certificate","identifiers":["kdt.local"]}
+{"level":"info","ts":1794398452.4669762,"logger":"tls","msg":"reloading managed certificate","identifiers":["volume.local"]}
+{"level":"info","ts":1794398452.466354,"logger":"tls.renew","msg":"releasing lock","identifier":"financeiro.local"}
+{"level":"info","ts":1794398452.4669762,"logger":"tls.renew","msg":"certificate renewed successfully","identifier":"192.168.1.10","issuer":"local"}
+{"level":"info","ts":1794398452.468118,"logger":"tls","msg":"reloading managed certificate","identifiers":["financeiro.local"]}
+{"level":"info","ts":1794398452.468118,"logger":"tls.renew","msg":"releasing lock","identifier":"192.168.1.10"}
+{"level":"info","ts":1794398452.4686947,"logger":"tls","msg":"reloading managed certificate","identifiers":["192.168.1.10"]}
+{"level":"info","ts":1794398452.469848,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["ponto.admin"],"new_expiration":1794441653}
+{"level":"info","ts":1794398452.472153,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["ponto.local"],"new_expiration":1794441653}
+{"level":"info","ts":1794398452.4727035,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["volume.local"],"new_expiration":1794441653}
+{"level":"info","ts":1794398452.4743726,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["kdt.local"],"new_expiration":1794441653}
+{"level":"info","ts":1794398452.4754765,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["financeiro.local"],"new_expiration":1794441653}
+{"level":"info","ts":1794398452.4771156,"logger":"tls.cache","msg":"replaced certificate in cache","subjects":["192.168.1.10"],"new_expiration":1794441653}
