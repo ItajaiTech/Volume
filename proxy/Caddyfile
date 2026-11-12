@@ -1,110 +1,148 @@
-﻿{
-    # Keep redirects explicit, but allow `tls internal` to issue and renew the
-    # local certificate for financeiro.local.
-    auto_https disable_redirects
+{
+	# Redirects are explicit so the legacy .local names can point to .test.
+	auto_https disable_redirects
 }
 
+# Ponto: .test is canonical; .local remains only as a compatibility redirect.
 http://ponto.local {
-    redir https://ponto.local{uri} 301
-}
-
-http://ponto.admin {
-    redir https://ponto.admin{uri} 301
-}
-
-http://volume.local {
-    redir https://volume.local{uri} 301
+	redir https://ponto.test{uri} 308
 }
 
 https://ponto.local {
-    tls internal
-    reverse_proxy https://127.0.0.1:5000 {
-        transport http {
-            tls_insecure_skip_verify
-        }
-        header_up X-Forwarded-Proto https
-    }
+	tls internal
+	redir https://ponto.test{uri} 308
+}
+
+http://ponto.test {
+	redir https://ponto.test{uri} 308
+}
+
+https://ponto.test {
+	tls internal
+	reverse_proxy https://127.0.0.1:5000 {
+		transport http {
+			tls_insecure_skip_verify
+		}
+		header_up X-Forwarded-Proto https
+	}
+}
+
+# Administrative Ponto hostname is unchanged.
+http://ponto.admin {
+	redir https://ponto.admin{uri} 301
 }
 
 https://ponto.admin {
-    tls internal
-    reverse_proxy https://127.0.0.1:5000 {
-        transport http {
-            tls_insecure_skip_verify
-        }
-        header_up X-Forwarded-Proto https
-    }
+	tls internal
+	reverse_proxy https://127.0.0.1:5000 {
+		transport http {
+			tls_insecure_skip_verify
+		}
+		header_up X-Forwarded-Proto https
+	}
+}
+
+# Volume: .test is canonical; .local remains only as a compatibility redirect.
+http://volume.local {
+	redir https://volume.test{uri} 308
 }
 
 https://volume.local {
-    tls internal
-    reverse_proxy http://127.0.0.1:6100 {
-        header_up X-Forwarded-Proto https
-    }
+	tls internal
+	redir https://volume.test{uri} 308
 }
 
-# Portal de instalacao da autoridade certificadora publica (acesso inicial por HTTP).
+http://volume.test {
+	redir https://volume.test{uri} 308
+}
+
+https://volume.test {
+	tls internal
+	reverse_proxy http://127.0.0.1:6100 {
+		header_up X-Forwarded-Proto https
+	}
+}
+
+# Portal for installing the local Caddy certificate authority.
 http://192.168.1.10 {
-    root * C:\xampp\caddy-ca-distribution
-    @downloads path /caddy-local-root.cer /install-caddy-root.ps1 /instalar-certificado.cmd
-    header @downloads Content-Disposition "attachment"
-    file_server
+	root * C:\xampp\caddy-ca-distribution
+	@downloads path /caddy-local-root.cer /install-caddy-root.ps1 /instalar-certificado.cmd
+	header @downloads Content-Disposition "attachment"
+	file_server
 }
-# Direct IP access: Caddy manages a separate internal certificate for the LAN IP.
+
 https://192.168.1.10 {
-    tls internal
-    respond "Caddy HTTPS ativo. Use o domínio do sistema desejado." 200
+	tls internal
+	respond "Caddy HTTPS ativo. Use o domínio do sistema desejado." 200
 }
-# FIN / WordPress is served by Apache internally. Caddy owns the public
-# local ports and supplies a locally trusted HTTPS certificate.
+
+# Financeiro compatibility on ports 8080/8443.
 http://financeiro.local:8080 {
-    redir https://financeiro.local:8443{uri} 308
-}
-
-# KDT is served by the shared XAMPP/Apache instance. Caddy terminates HTTPS
-# with its local CA while Apache remains on the existing internal port.
-http://kdt.local {
-    redir https://kdt.local{uri} 308
-}
-
-https://kdt.local {
-    tls internal
-    reverse_proxy http://127.0.0.1:9073 {
-        header_up Host {host}
-        header_up X-Forwarded-Proto https
-        header_up X-Forwarded-Port 443
-    }
+	redir https://financeiro.test{uri} 308
 }
 
 https://financeiro.local:8443 {
-    tls internal
-    reverse_proxy http://127.0.0.1:8081 {
-        header_up Host {http.request.host}:{http.request.port}
-        header_up X-Forwarded-Host {host}
-        header_up X-Forwarded-Proto https
-        header_up X-Forwarded-Port 8443
-    }
+	tls internal
+	redir https://financeiro.test{uri} 308
 }
 
-# Keeps existing local HTTP addresses working after Apache moves to 8081.
+http://financeiro.test:8080 {
+	redir https://financeiro.test{uri} 308
+}
+
+https://financeiro.test:8443 {
+	tls internal
+	redir https://financeiro.test{uri} 308
+}
+
+# Keeps existing direct HTTP port 8080 behavior.
 http://:8080 {
-    reverse_proxy http://127.0.0.1:8081
+	reverse_proxy http://127.0.0.1:8081
 }
 
-# FIN: HTTPS on the standard port 443; port 8443 remains available for compatibility.
+# Financeiro canonical standard HTTPS endpoint.
 http://financeiro.local {
-    redir https://financeiro.local{uri} 308
+	redir https://financeiro.test{uri} 308
 }
 
 https://financeiro.local {
-    tls internal
-    reverse_proxy http://127.0.0.1:8081 {
-        header_up Host {host}
-        header_up X-Forwarded-Host {host}
-        header_up X-Forwarded-Proto https
-        header_up X-Forwarded-Port 443
-    }
+	tls internal
+	redir https://financeiro.test{uri} 308
 }
 
+http://financeiro.test {
+	redir https://financeiro.test{uri} 308
+}
 
+https://financeiro.test {
+	tls internal
+	reverse_proxy http://127.0.0.1:8081 {
+		header_up Host {host}
+		header_up X-Forwarded-Host {host}
+		header_up X-Forwarded-Proto https
+		header_up X-Forwarded-Port 443
+	}
+}
 
+# KDT: .test is canonical; .local remains only as a compatibility redirect.
+http://kdt.local {
+	redir https://kdt.test{uri} 308
+}
+
+https://kdt.local {
+	tls internal
+	redir https://kdt.test{uri} 308
+}
+
+http://kdt.test {
+	redir https://kdt.test{uri} 308
+}
+
+https://kdt.test {
+	tls internal
+	reverse_proxy http://127.0.0.1:9073 {
+		header_up Host {host}
+		header_up X-Forwarded-Proto https
+		header_up X-Forwarded-Port 443
+	}
+}

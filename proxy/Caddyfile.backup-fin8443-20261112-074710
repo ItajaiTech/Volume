@@ -1,0 +1,153 @@
+{
+	# Redirects are explicit so the legacy .local names can point to .test.
+	auto_https disable_redirects
+}
+
+# Ponto: .test is canonical; .local remains only as a compatibility redirect.
+http://ponto.local {
+	redir https://ponto.test{uri} 308
+}
+
+https://ponto.local {
+	tls internal
+	redir https://ponto.test{uri} 308
+}
+
+http://ponto.test {
+	redir https://ponto.test{uri} 308
+}
+
+https://ponto.test {
+	tls internal
+	reverse_proxy https://127.0.0.1:5000 {
+		transport http {
+			tls_insecure_skip_verify
+		}
+		header_up X-Forwarded-Proto https
+	}
+}
+
+# Administrative Ponto hostname is unchanged.
+http://ponto.admin {
+	redir https://ponto.admin{uri} 301
+}
+
+https://ponto.admin {
+	tls internal
+	reverse_proxy https://127.0.0.1:5000 {
+		transport http {
+			tls_insecure_skip_verify
+		}
+		header_up X-Forwarded-Proto https
+	}
+}
+
+# Volume: .test is canonical; .local remains only as a compatibility redirect.
+http://volume.local {
+	redir https://volume.test{uri} 308
+}
+
+https://volume.local {
+	tls internal
+	redir https://volume.test{uri} 308
+}
+
+http://volume.test {
+	redir https://volume.test{uri} 308
+}
+
+https://volume.test {
+	tls internal
+	reverse_proxy http://127.0.0.1:6100 {
+		header_up X-Forwarded-Proto https
+	}
+}
+
+# Portal for installing the local Caddy certificate authority.
+http://192.168.1.10 {
+	root * C:\xampp\caddy-ca-distribution
+	@downloads path /caddy-local-root.cer /install-caddy-root.ps1 /instalar-certificado.cmd
+	header @downloads Content-Disposition "attachment"
+	file_server
+}
+
+https://192.168.1.10 {
+	tls internal
+	respond "Caddy HTTPS ativo. Use o domínio do sistema desejado." 200
+}
+
+# Financeiro compatibility on ports 8080/8443.
+http://financeiro.local:8080 {
+	redir https://financeiro.test:8443{uri} 308
+}
+
+https://financeiro.local:8443 {
+	tls internal
+	redir https://financeiro.test:8443{uri} 308
+}
+
+http://financeiro.test:8080 {
+	redir https://financeiro.test:8443{uri} 308
+}
+
+https://financeiro.test:8443 {
+	tls internal
+	reverse_proxy http://127.0.0.1:8081 {
+		header_up Host {http.request.host}:{http.request.port}
+		header_up X-Forwarded-Host {host}
+		header_up X-Forwarded-Proto https
+		header_up X-Forwarded-Port 8443
+	}
+}
+
+# Keeps existing direct HTTP port 8080 behavior.
+http://:8080 {
+	reverse_proxy http://127.0.0.1:8081
+}
+
+# Financeiro canonical standard HTTPS endpoint.
+http://financeiro.local {
+	redir https://financeiro.test{uri} 308
+}
+
+https://financeiro.local {
+	tls internal
+	redir https://financeiro.test{uri} 308
+}
+
+http://financeiro.test {
+	redir https://financeiro.test{uri} 308
+}
+
+https://financeiro.test {
+	tls internal
+	reverse_proxy http://127.0.0.1:8081 {
+		header_up Host {host}
+		header_up X-Forwarded-Host {host}
+		header_up X-Forwarded-Proto https
+		header_up X-Forwarded-Port 443
+	}
+}
+
+# KDT: .test is canonical; .local remains only as a compatibility redirect.
+http://kdt.local {
+	redir https://kdt.test{uri} 308
+}
+
+https://kdt.local {
+	tls internal
+	redir https://kdt.test{uri} 308
+}
+
+http://kdt.test {
+	redir https://kdt.test{uri} 308
+}
+
+https://kdt.test {
+	tls internal
+	reverse_proxy http://127.0.0.1:9073 {
+		header_up Host {host}
+		header_up X-Forwarded-Proto https
+		header_up X-Forwarded-Port 443
+	}
+}

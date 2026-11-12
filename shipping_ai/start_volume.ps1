@@ -72,7 +72,7 @@ if (-not $env:VOLUME_BIND_HOST) {
     $env:VOLUME_BIND_HOST = "0.0.0.0"
 }
 if (-not $env:VOLUME_PUBLIC_HOST) {
-    $env:VOLUME_PUBLIC_HOST = "volume.local"
+    $env:VOLUME_PUBLIC_HOST = "volume.test"
 }
 if (-not $env:VOLUME_PORT) {
     $env:VOLUME_PORT = "6100"
@@ -93,7 +93,7 @@ if (-not $env:VOLUME_SERVER_NAME) {
     $env:VOLUME_SERVER_NAME = $env:VOLUME_PUBLIC_HOST
 }
 if (-not $env:VOLUME_TRUSTED_HOSTS) {
-    $env:VOLUME_TRUSTED_HOSTS = "volume.local,volume.local:6100,volume.local:443,volume.local:80"
+    $env:VOLUME_TRUSTED_HOSTS = "volume.test,volume.test:6100,volume.test:443,volume.test:80,volume.local,volume.local:6100,volume.local:443,volume.local:80"
 }
 
 if (-not $env:VOLUME_DEBUG) {

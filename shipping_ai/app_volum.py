@@ -93,7 +93,7 @@ def form_checkbox_to_int(form_data, key):
 APP_PORT = safe_int_env("VOLUME_PORT", 6100)
 APP_HTTP_PORT = safe_int_env("VOLUME_HTTP_PORT", 6080)
 APP_HOST = os.getenv("VOLUME_BIND_HOST", os.getenv("VOLUME_HOST", "0.0.0.0"))
-APP_PUBLIC_HOST = os.getenv("VOLUME_PUBLIC_HOST", "volume.local")
+APP_PUBLIC_HOST = os.getenv("VOLUME_PUBLIC_HOST", "volume.test")
 APP_SERVER_NAME = os.getenv(
     "VOLUME_SERVER_NAME",
     APP_PUBLIC_HOST if APP_PORT == 443 else f"{APP_PUBLIC_HOST}:{APP_PORT}",
@@ -136,6 +136,7 @@ def add_trusted_host(raw_host):
 for raw_host in [
     APP_PUBLIC_HOST,
     APP_SERVER_NAME,
+    "volume.test",
     "volume.local",
     ".local",
     "127.0.0.1",
