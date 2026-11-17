@@ -4,6 +4,7 @@ $logDir = Join-Path $proxyDir "logs"
 $stdoutLog = Join-Path $logDir "caddy_stdout.log"
 $stderrLog = Join-Path $logDir "caddy_stderr.log"
 $localCaddyExe = Join-Path $proxyDir "caddy.exe"
+$hostingerSecretPath = Join-Path $proxyDir "hostinger-api-token.dpapi"
 
 function Get-ProcessSnapshot {
     if (Get-Command Get-CimInstance -ErrorAction SilentlyContinue) {
@@ -30,6 +31,20 @@ if ($localCmd) {
 }
 if (-not $caddyExe) {
     $cmd = Get-Command caddy -ErrorAction SilentlyContinue
+}
+
+# O token fica criptografado via DPAPI e so pode ser aberto pelo mesmo usuario.
+# Nunca e gravado no Caddyfile nem passado na linha de comando.
+if (Test-Path $hostingerSecretPath) {
+    try {
+        $protectedToken = (Get-Content -LiteralPath $hostingerSecretPath -Raw).Trim()
+        $secureToken = $protectedToken | ConvertTo-SecureString
+        $credential = New-Object System.Management.Automation.PSCredential("hostinger", $secureToken)
+        $env:HOSTINGER_API_TOKEN = $credential.GetNetworkCredential().Password
+    } catch {
+        Write-Host "Falha ao abrir token Hostinger protegido: $_" -ForegroundColor Red
+        exit 1
+    }
 }
 if ($cmd -and -not $caddyExe) {
     $caddyExe = $cmd.Source

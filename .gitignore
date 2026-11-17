@@ -1,0 +1,6 @@
+# Segredos locais e artefatos de compilacao do proxy
+proxy/hostinger-api-token.dpapi
+proxy/build-tools/
+proxy/caddy-hostinger.exe
+proxy/caddy.exe.pre-hostinger
+proxy/logs/

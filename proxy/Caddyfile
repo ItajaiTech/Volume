@@ -146,3 +146,16 @@ https://kdt.test {
 		header_up X-Forwarded-Port 443
 	}
 }
+
+# Keepdata Gateway: public HTTPS endpoint for the WordPress integration.
+# The Python API remains bound locally and is never exposed directly.
+https://api.keepdata.net.br:8765 {
+	tls {
+		dns hostinger {env.HOSTINGER_API_TOKEN}
+	}
+	reverse_proxy http://127.0.0.1:8766 {
+		header_up Host {host}
+		header_up X-Forwarded-Proto https
+		header_up X-Forwarded-Port 8765
+	}
+}
