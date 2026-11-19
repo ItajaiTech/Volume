@@ -159,3 +159,16 @@ https://api.keepdata.net.br:8765 {
 		header_up X-Forwarded-Port 8765
 	}
 }
+
+# WhatsApp/Zap service: public standard HTTPS endpoint.
+# The Node service remains on the local port 8787 behind Caddy.
+https://zap.keepdata.net.br {
+	tls {
+		dns hostinger {env.HOSTINGER_API_TOKEN}
+	}
+	reverse_proxy http://127.0.0.1:8787 {
+		header_up Host {host}
+		header_up X-Forwarded-Proto https
+		header_up X-Forwarded-Port 443
+	}
+}
